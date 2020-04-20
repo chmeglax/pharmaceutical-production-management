@@ -1,0 +1,188 @@
+<!--!EQUIPMENTS-->
+
+<!-- addEquipmentModal Modal HTML -->
+<div id="addEquipmentModal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" action="/api/">
+        <div class="modal-header">
+          <h4 class="modal-title">Add Equipment</h4>
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-hidden="true"
+          >
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Name</label>
+            <input
+              type="text"
+              class="form-control"
+              name="name"
+              id="name"
+              required
+            />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <input
+            type="button"
+            class="btn btn-default"
+            data-dismiss="modal"
+            value="Cancel"
+          />
+          <input
+            type="button"
+            class="btn btn-success"
+            value="Add"
+            onclick="add()"
+          />
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- editEquipmentModal Modal HTML -->
+<div id="editEquipmentModal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form>
+        <div class="modal-header">
+          <h4 class="modal-title">edit Equipment</h4>
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-hidden="true"
+          >
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <input type="text" id="id" class="form-control" hidden />
+          </div>
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" id="name" class="form-control" required />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <input
+            type="button"
+            class="btn btn-default"
+            data-dismiss="modal"
+            value="Cancel"
+          />
+          <input
+            type="button"
+            class="btn btn-info"
+            value="Save"
+            onclick="update()"
+          />
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- deleteEquipmentModal Modal HTML -->
+<div id="deleteEquipmentModal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form>
+        <div class="modal-header">
+          <h4 class="modal-title">Delete Equipment</h4>
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-hidden="true"
+          >
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <input type="text" id="id" class="form-control" hidden />
+          </div>
+          <p>Are you sure you want to delete this Equipment?</p>
+          <p class="text-warning">
+            <small>This action cannot be undone.</small>
+          </p>
+        </div>
+        <div class="modal-footer">
+          <input
+            type="button"
+            class="btn btn-default"
+            data-dismiss="modal"
+            value="Cancel"
+          />
+          <input
+            type="button"
+            class="btn btn-danger"
+            value="Delete"
+            onclick="deletee()"
+          />
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+  function update() {
+    var name = $("#editEquipmentModal #name").val();
+    var id = $("#editEquipmentModal #id").val();
+    $.ajax({
+      url: "http://127.0.0.1:3000/api/equipments/" + id,
+      method: "patch",
+      data: {
+        name: name,
+      },
+      success: function (response) {
+        $("#table").bootstrapTable("refresh");
+        $("#editEquipmentModal").modal("toggle");
+        Toast.fire({
+          type: "success",
+          title: "Product " + name + " updated successfully",
+        });
+      },
+    });
+  }
+  function add() {
+    var name = $("#addEquipmentModal #name").val();
+    $.ajax({
+      url: "http://127.0.0.1:3000/api/equipments/",
+      method: "post",
+      data: {
+        name: name,
+      },
+      success: function (response) {
+        $("#table").bootstrapTable("refresh");
+        $("#addEquipmentModal").modal("toggle");
+        Toast.fire({
+          type: "success",
+          title: "Equipment " + name + " added successfully",
+        });
+      },
+    });
+  }
+  function deletee() {
+    var id = $("#deleteEquipmentModal #id").val();
+    $.ajax({
+      url: "http://127.0.0.1:3000/api/equipments/" + id,
+      method: "delete",
+      success: function (response) {
+        $("#table").bootstrapTable("refresh");
+        $("#deleteEquipmentModal").modal("toggle");
+        Toast.fire({
+          type: "success",
+          title: "Equipements Deleted successfully",
+        });
+      },
+    });
+  }
+</script>
