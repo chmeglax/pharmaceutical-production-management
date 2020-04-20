@@ -1,227 +1,301 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Hikma | Log in</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/assets/dist/img/hikmaLogo2.png" />
 
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Hikma | Log in</title>
-  <!-- Tell the browser to be responsive to screen width -->
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="/assets/dist/img/hikmaLogo2.png">
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="/assets/plugins/fontawesome-free/css/all.min.css"
+    />
+    <!-- Ionicons -->
+    <link
+      rel="stylesheet"
+      href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css"
+    />
+    <!-- icheck bootstrap -->
+    <link
+      rel="stylesheet"
+      href="/assets/plugins/icheck-bootstrap/icheck-bootstrap.min.css"
+    />
+    <!-- Theme style -->
+    <link rel="stylesheet" href="/assets/dist/css/adminlte.min.css" />
+    <!-- Google Font: Source Sans Pro -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700"
+      rel="stylesheet"
+    />
+    <style>
+      b {
+        color: #ff5c57;
+      }
 
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="/assets/plugins/fontawesome-free/css/all.min.css">
-  <!-- Ionicons -->
-  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-  <!-- icheck bootstrap -->
-  <link rel="stylesheet" href="/assets/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
-  <!-- Theme style -->
-  <link rel="stylesheet" href="/assets/dist/css/adminlte.min.css">
-  <!-- Google Font: Source Sans Pro -->
-  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
-  <style>
-    b {
-      color: #ff5c57;
-    }
+      .register-page {
+        background-image: url("../assets/dist/img/medicine-wallpapers.jpg");
+      }
 
-    .register-page {
-      background-image: url('../assets/dist/img/medicine-wallpapers.jpg');
-    }
+      #logo {
+        position: relative;
+        float: right;
+        right: 1em;
+        top: 0;
+        /* push it up into the element before it. This is a trick for bottom-right */
+        right: 0;
+        z-index: 200;
+        opacity: 0.5;
+        font-weight: bolder;
+      }
 
-    #logo {
-      position: relative;
-      float: right;
-      right: 1em;
-      top: 0;
-      /* push it up into the element before it. This is a trick for bottom-right */
-      right: 0;
-      z-index: 200;
-      opacity: 0.5;
-      font-weight: bolder;
-    }
+      img {
+        height: auto;
+        width: 15%;
+      }
+    </style>
+  </head>
 
-    img {
-      height: auto;
-      width: 15%;
-    }
-  </style>
-
-</head>
-
-<body class="register-page" data-gr-c-s-loaded="true" style="min-height: 586.8px;">
-  <div class="register-box">
-    <div class="register-logo">
-      <a href="https://www.hikma.com/tn-fr/page-daccueil/"><strong><b>Hikma</b></strong>Pharmaceuticals</a>
-    </div>
-
-    <div class="card">
-      <div class="card-body register-card-body">
-        <p class="login-box-msg">Register a new membership</p>
-
-        <% if ( messages.exist ) { %>
-        <%= messages.exist %>
-        <% } %>
-        <form action="/register" method="POST" name="registration">
-          <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="Full name" name="name">
-            <div class="input-group-append">
-              <div class="input-group-text">
-                <span class="fas fa-user"></span>
-              </div>
-            </div>
-          </div>
-          <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="Department" name="department">
-            <div class="input-group-append">
-              <div class="input-group-text">
-                <span class="fas fa-address-card"></span>
-              </div>
-            </div>
-          </div>
-          <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="Phone" name="phone">
-            <div class="input-group-append">
-              <div class="input-group-text">
-                <span class="fas fa-phone"></span>
-              </div>
-            </div>
-          </div>
-          <div class="input-group mb-3">
-            <input type="email" class="form-control" placeholder="Email" name="email">
-            <div class="input-group-append">
-              <div class="input-group-text">
-                <span class="fas fa-envelope"></span>
-              </div>
-            </div>
-          </div>
-          <div class="input-group mb-3">
-            <input type="password" class="form-control" placeholder="Password" name="password" id="password">
-            <div class="input-group-append">
-              <div class="input-group-text">
-                <span class="fas fa-lock"></span>
-              </div>
-            </div>
-          </div>
-          <div class="input-group mb-3">
-            <input type="password" class="form-control" placeholder="Retype password" name="confirmPassword">
-            <div class="input-group-append">
-              <div class="input-group-text">
-                <span class="fas fa-lock"></span>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-8">
-              <div class="icheck-primary">
-                <input type="checkbox" id="agreeTerms" name="terms" value="agree" required>
-                <label for="agreeTerms">
-                  I agree to the <a href="#">terms</a>
-                </label>
-              </div>
-            </div>
-            <!-- /.col -->
-            <div class="col-4">
-              <button type="submit" class="btn btn-primary btn-block">Register</button>
-            </div>
-            <!-- /.col -->
-          </div>
-        </form>
-
-
-
-        <a href="/login" class="text-center">I already have a membership</a>
+  <body
+    class="register-page"
+    data-gr-c-s-loaded="true"
+    style="min-height: 586.8px;"
+  >
+    <div class="register-box">
+      <div class="register-logo">
+        <a href="https://www.hikma.com/tn-fr/page-daccueil/"
+          ><strong><b>Hikma</b></strong
+          >Pharmaceuticals</a
+        >
       </div>
-      <!-- /.form-box -->
-    </div><!-- /.card -->
-  </div>
-  <!-- /.register-box -->
-  <div id="logo"><img src="../assets/dist/img/hikmaLogo.png" alt=""></div>
-  <!-- jQuery -->
-  <script src="/assets/plugins/jquery/jquery.min.js"></script>
-  <!-- Bootstrap 4 -->
-  <script src="/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <!-- hikma App -->
-  <script src="/assets/dist/js/adminlte.min.js"></script>
 
+      <div class="card">
+        <div class="card-body register-card-body">
+          <p class="login-box-msg">Register a new membership</p>
 
-  <script src="assets\plugins\jquery-validation\jquery.validate.min.js"></script>
-  <script src="assets\plugins\jquery-validation\additional-methods.min.js"></script>
-  <script>
-    $(function () {
-      $("form[name='registration']").validate({
-        errorPlacement: function ($error, $element) {
-          $error.appendTo($element.closest("div"));
-        },
-        // Initialize form validation on the registration form.
-        // It has the name attribute "registration"
-        rules: {
-          // The key name on the left side is the name attribute
-          // of an input field. Validation rules are defined
-          // on the right side
-          name: "required",
-          email: {
-            required: true,
-            // Specify that email should be validated
-            // by the built-in "email" rule
-            email: true
-          },
-          password: {
-            required: true,
-            minlength: 5
-          }, confirmPassword: {
-            required: true,
-            equalTo: "#password"
-          },
-          cin: {
-            required: true,
-            digits: true,
-            minlength: 7,
-            maxlength: 8,
-          },
-          phone: {
-            required: true,
-            digits: true,
-            minlength: 8
-          },
-          terms: {
-            required: true
-          }
+          <% if ( messages.exist ) { %> <%= messages.exist %> <% } %>
+          <form action="/register" method="POST" name="registration">
+            <div class="input-group mb-3">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Full name"
+                name="name"
+              />
+              <div class="input-group-append">
+                <div class="input-group-text">
+                  <span class="fas fa-user"></span>
+                </div>
+              </div>
+            </div>
+            <div class="input-group mb-3">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Department"
+                name="department"
+              />
+              <div class="input-group-append">
+                <div class="input-group-text">
+                  <span class="fas fa-vials"></span>
+                </div>
+              </div>
+            </div>
+            <div class="input-group mb-3">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Phone"
+                name="phone"
+              />
+              <div class="input-group-append">
+                <div class="input-group-text">
+                  <span class="fas fa-phone"></span>
+                </div>
+              </div>
+            </div>
+            <div class="input-group mb-3">
+              <input
+                type="email"
+                class="form-control"
+                placeholder="Email"
+                name="email"
+              />
+              <div class="input-group-append">
+                <div class="input-group-text">
+                  <span class="fas fa-envelope"></span>
+                </div>
+              </div>
+            </div>
+            <div class="input-group mb-3">
+              <select class="custom-select" name="site">
+                <option>IAB</option>
+                <option>MEDICEF</option>
+              </select>
+              <div class="input-group-append">
+                <div class="input-group-text">
+                  <span class="fas fa-map-marked-alt"></span>
+                </div>
+              </div>
+            </div>
+            <div class="input-group mb-3">
+              <select class="custom-select" name="type" required>
+                <option value="PRODUCTION">Production</option>
+                <option value="SUPERVISOR">Supervisor</option>
+                <option value="MANAGER">Manager</option>
+                <option value="ADMIN">Admin</option>
+                <option value="READONLY">Read Only</option>
+              </select>
+              <div class="input-group-append">
+                <div class="input-group-text">
+                  <span class="fas fa-user-circle"></span>
+                </div>
+              </div>
+            </div>
+            <div class="input-group mb-3">
+              <input
+                type="password"
+                class="form-control"
+                placeholder="Password"
+                name="password"
+                id="password"
+              />
+              <div class="input-group-append">
+                <div class="input-group-text">
+                  <span class="fas fa-lock"></span>
+                </div>
+              </div>
+            </div>
+            <div class="input-group mb-3">
+              <input
+                type="password"
+                class="form-control"
+                placeholder="Retype password"
+                name="confirmPassword"
+              />
+              <div class="input-group-append">
+                <div class="input-group-text">
+                  <span class="fas fa-lock"></span>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-8">
+                <div class="icheck-primary">
+                  <input
+                    type="checkbox"
+                    id="agreeTerms"
+                    name="terms"
+                    value="agree"
+                    required
+                  />
+                  <label for="agreeTerms">
+                    I agree to the <a href="#">terms</a>
+                  </label>
+                </div>
+              </div>
+              <!-- /.col -->
+              <div class="col-4">
+                <button type="submit" class="btn btn-primary btn-block">
+                  Register
+                </button>
+              </div>
+              <!-- /.col -->
+            </div>
+          </form>
+        </div>
+        <!-- /.form-box -->
+      </div>
+      <!-- /.card -->
+    </div>
+    <!-- /.register-box -->
+    <div id="logo"><img src="../assets/dist/img/hikmaLogo.png" alt="" /></div>
+    <!-- jQuery -->
+    <script src="/assets/plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- hikma App -->
+    <script src="/assets/dist/js/adminlte.min.js"></script>
 
-        },
-        // Specify validation error messages
-        messages: {
-          name: "Please enter your Full name",
-          lastname: "Please enter your lastname",
-          password: {
-            required: "Please provide a password",
-            minlength: "Your password must be at least 5 characters long"
+    <script src="assets\plugins\jquery-validation\jquery.validate.min.js"></script>
+    <script src="assets\plugins\jquery-validation\additional-methods.min.js"></script>
+    <script>
+      $(function () {
+        $("form[name='registration']").validate({
+          errorPlacement: function ($error, $element) {
+            $error.appendTo($element.closest("div"));
           },
-          cin: {
-            required: "Please provide a valid CIN",
-            minlength: "Your CIN must be at least 8 digits long"
+          // Initialize form validation on the registration form.
+          // It has the name attribute "registration"
+          rules: {
+            // The key name on the left side is the name attribute
+            // of an input field. Validation rules are defined
+            // on the right side
+            name: "required",
+            email: {
+              required: true,
+              // Specify that email should be validated
+              // by the built-in "email" rule
+              email: true,
+            },
+            password: {
+              required: true,
+              minlength: 5,
+            },
+            confirmPassword: {
+              required: true,
+              equalTo: "#password",
+            },
+            cin: {
+              required: true,
+              digits: true,
+              minlength: 7,
+              maxlength: 8,
+            },
+            phone: {
+              required: true,
+              digits: true,
+              minlength: 8,
+            },
+            terms: {
+              required: true,
+            },
           },
-          email: "Please enter a valid email address",
-          confirmPassword: {
-            equalTo: "Your password don't match",
-            required: "please verify your password"
+          // Specify validation error messages
+          messages: {
+            name: "Please enter your Full name",
+            lastname: "Please enter your lastname",
+            password: {
+              required: "Please provide a password",
+              minlength: "Your password must be at least 5 characters long",
+            },
+            cin: {
+              required: "Please provide a valid CIN",
+              minlength: "Your CIN must be at least 8 digits long",
+            },
+            email: "Please enter a valid email address",
+            confirmPassword: {
+              equalTo: "Your password don't match",
+              required: "please verify your password",
+            },
+            terms: "Please accept our terms",
+            erms: "Please provide your phone number",
           },
-          terms: "Please accept our terms",
-          erms: "Please provide your phone number"
-
-        }, errorElement: 'span',
-        errorPlacement: function (error, element) {
-          error.addClass('invalid-feedback');
-          element.closest('div').append(error);
-        },
-        highlight: function (element, errorClass, validClass) {
-          $(element).addClass('is-invalid');
-        },
-        unhighlight: function (element, errorClass, validClass) {
-          $(element).removeClass('is-invalid');
-        }
+          errorElement: "span",
+          errorPlacement: function (error, element) {
+            error.addClass("invalid-feedback");
+            element.closest("div").append(error);
+          },
+          highlight: function (element, errorClass, validClass) {
+            $(element).addClass("is-invalid");
+          },
+          unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass("is-invalid");
+          },
+        });
       });
-    });
-  </script>
-</body>
-
+    </script>
+  </body>
 </html>

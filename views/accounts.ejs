@@ -35,6 +35,18 @@
       href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700"
       rel="stylesheet"
     />
+
+    <style>
+      img {
+        border-radius: 4px;
+        padding: 3px;
+        width: 45px;
+      }
+    </style>
+    <link
+      href="assets\plugins\sweetalert2-theme-bootstrap-4\bootstrap-4.min.css"
+      rel="stylesheet"
+    />
   </head>
 
   <body class="hold-transition sidebar-mini">
@@ -147,10 +159,8 @@
     <script src="assets\plugins\jquery-tableExport\libs\jsPDF-AutoTable\jspdf.plugin.autotable.js"></script>
     <!-- sweetalert2  -->
     <script src="/assets/plugins/sweetalert2/sweetalert2.js"></script>
-    <!-- hikma App -->
-    <script src="assets/dist/js/adminlte.min.js"></script>
-    <!-- hikma for demo purposes -->
-    <script src="assets/dist/js/demo.js"></script>
+    <!-- hikma dashboard  -->
+    <script src="/assets/dist/js/pages/dashboard.js"></script>
 
     <!-- hikma App -->
     <script src="assets/dist/js/adminlte.min.js"></script>
@@ -172,14 +182,21 @@
       }
 
       function operateFormatter(value, row, index) {
-        return [
-          '<a class="edit" href="javascript:void(0)" title="edit" >',
-          '<i class="fa fa-edit fa-lg" style="color:green"></i>',
-          "</a>  ",
-          '<a class="remove" href="javascript:void(0)" title="Remove">',
-          '<i class="fa fa-trash fa-lg" style="color:red"></i>',
-          "</a>",
-        ].join("");
+        if (row.access.type === "admin")
+          return [
+            '<a class="edit" href="javascript:void(0)" title="edit" >',
+            '<i class="fa fa-edit fa-lg" style="color:green"></i>',
+            "</a>  ",
+          ].join("");
+        else
+          return [
+            '<a class="edit" href="javascript:void(0)" title="edit" >',
+            '<i class="fa fa-edit fa-lg" style="color:green"></i>',
+            "</a>  ",
+            '<a class="remove" href="javascript:void(0)" title="Remove">',
+            '<i class="fa fa-trash fa-lg" style="color:red"></i>',
+            "</a>",
+          ].join("");
       }
       function typeFormatter(value, row, index) {
         var classs;
@@ -200,20 +217,73 @@
         );
       }
       function siteFormatter(value, row, index) {
-        return [value.toUpperCase()].join("");
+        if (value.toLowerCase() === "iab")
+          return ["<img src='/assets/dist/img/iab.jpg'></img>"].join("");
+        else if (value.toLowerCase() === "medicef")
+          return ["<img src='/assets/dist/img/medicef.jpg'></img>"].join("");
+        else
+          return [
+            "<img src='/assets/dist/img/medicef.jpg'></img><img src='/assets/dist/img/iab.jpg'></img>",
+          ].join("");
       }
 
       window.operateEvents = {
         "click .edit": function (e, value, row, index) {
-          $("#editEquipmentModal #name").val(row.name);
-          $("#editEquipmentModal #id").val(row._id);
+          console.log(row);
+          $("#editUserModal #name").val(row.name);
+          $("#editUserModal #id").val(row._id);
+          $("#editUserModal #site").val(row.access.site.toUpperCase());
+          $("#editUserModal #type").val(row.access.type.toUpperCase());
+          $("#editUserModal #department").val(row.department);
+          $("#editUserModal #phone").val(row.phone);
+          $("#editUserModal #email").val(row.email);
 
-          $("#editEquipmentModal").modal("toggle");
+          $("#editUserModal").modal("toggle");
         },
         "click .remove": function (e, value, row, index) {
-          $("#deleteEquipmentModal #id").val(row._id);
+          const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+              confirmButton: "btn btn-success",
+              cancelButton: "btn btn-danger",
+            },
+            buttonsStyling: false,
+          });
 
-          $("#deleteEquipmentModal").modal("toggle");
+          swalWithBootstrapButtons
+            .fire({
+              title: "Are you sure?",
+              text: "You won't be able to revert this!",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonText: "Yes, delete it!",
+              cancelButtonText: "No, cancel!",
+              reverseButtons: true,
+            })
+            .then((result) => {
+              if (result.value) {
+                $.ajax({
+                  url: "http://127.0.0.1:3000/api/users/" + row._id,
+                  method: "delete",
+                  success: function (response) {
+                    $("#table").bootstrapTable("refresh");
+                    swalWithBootstrapButtons.fire(
+                      "Deleted!",
+                      "this account has been deleted.",
+                      "success"
+                    );
+                  },
+                });
+              } else if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.cancel
+              ) {
+                swalWithBootstrapButtons.fire(
+                  "Cancelled",
+                  "this account is safe :)",
+                  "error"
+                );
+              }
+            });
         },
       };
 
@@ -231,7 +301,7 @@
           exportDataType: "all",
           exportOptions: {
             fileName: "Accounts",
-            ignoreColumn: ["operate"],
+            ignoreColumn: [5],
             jspdf: {
               format: "a4",
               margins: { left: 10, right: 10, top: 20, bottom: 20 },
@@ -273,6 +343,7 @@
                 align: "center",
                 colspan: 2,
                 valign: "middle",
+                printIgnore: true,
               },
               {
                 field: "department",
@@ -301,6 +372,7 @@
                 sortable: true,
                 align: "center",
                 formatter: siteFormatter,
+                printIgnore: true,
               },
               {
                 field: "access.type",
@@ -308,6 +380,7 @@
                 sortable: true,
                 align: "center",
                 formatter: typeFormatter,
+                printIgnore: true,
               },
             ],
           ],
@@ -322,7 +395,7 @@
         initTable();
         Toast = Swal.mixin({
           toast: true,
-          position: "top-end",
+          position: "bottom-end",
           showConfirmButton: false,
           timer: 3000,
         });

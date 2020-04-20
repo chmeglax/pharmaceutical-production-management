@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const connection = mongoose
-  .connect("mongodb://localhost/hikma", {
+  .connect("mongodb://" + process.env.DB_HOST + "/" + process.env.DB_USER, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
@@ -34,11 +34,9 @@ const UserSchema = new mongoose.Schema({
   access: {
     site: {
       type: String,
-      default: "iab",
     },
     type: {
       type: String,
-      default: "user",
     },
   },
 });

@@ -115,27 +115,19 @@ var test = 0;
 app.post("/register", checkAuthenticated, async function (req, res) {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    /*const user = User.findOne({ email: req.body.email })
-    .then((user) => {
-
-      if (user) {
-        req.flash('exist','user exist')
-        return res.redirect('/register')      
-      }})
-      console.log(test)
-      if(test===1){
-        req.flash('exist','user exist')
-        return res.redirect('/register')
-      }*/
     var newUser = new User({
       name: req.body.name,
       email: req.body.email,
       password: hashedPassword,
       department: req.body.department,
+      access: {
+        site: req.body.site,
+        type: req.body.type,
+      },
       phone: req.body.phone,
     });
     newUser.save();
-    res.redirect("/login");
+    res.redirect("/accounts");
   } catch {
     res.redirect("/register");
   }

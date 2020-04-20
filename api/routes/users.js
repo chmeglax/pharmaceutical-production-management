@@ -29,7 +29,7 @@ router.post("/", async (req, res) => {
     name: req.body.name,
   });
   try {
-    const newEquipments = await user.save();
+    const newusers = await user.save();
     res.redirect("/");
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -40,10 +40,15 @@ router.post("/", async (req, res) => {
 router.patch("/:id", getUsers, async (req, res) => {
   if (req.body.name != null) {
     res.users.name = req.body.name;
+    res.users.email = req.body.email;
+    res.users.department = req.body.department;
+    res.users.phone = req.body.phone;
+    res.users.access.site = req.body.access.site;
+    res.users.access.type = req.body.access.type;
   }
   try {
-    const updatedEquipments = await res.users.save();
-    res.json(updatedEquipments);
+    const updatedusers = await res.users.save();
+    res.json(updatedusers);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
