@@ -23,11 +23,7 @@
       href="/assets\plugins\bootstrap-table\dist\bootstrap-table.min.css"
       rel="stylesheet"
     />
-    <!-- SweetAlert2 -->
-    <link
-      rel="stylesheet"
-      href="/assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css"
-    />
+
     <!-- Theme style -->
     <link rel="stylesheet" href="assets/dist/css/adminlte.min.css" />
     <!-- Google Font: Source Sans Pro -->
@@ -35,7 +31,24 @@
       href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700"
       rel="stylesheet"
     />
+
+    <style>
+      img {
+        border-radius: 4px;
+        padding: 3px;
+        height: 35px;
+      }
+      .swal2-cancel {
+        margin-right: 0.25rem !important;
+      }
+    </style>
+
+    <link
+      href="assets\plugins\sweetalert2-theme-bootstrap-4\bootstrap-4.min.css"
+      rel="stylesheet"
+    />
   </head>
+
   <body class="hold-transition sidebar-mini">
     <div class="wrapper">
       <!-- Navbar -->
@@ -69,18 +82,29 @@
         <!-- Main content -->
         <section class="content">
           <div class="row">
+            <% if (user.access.site=="ALL" || user.access.site=='IAB') { %>
             <div class="col-12">
               <!-- /.card -->
 
-              <div class="card">
+              <div class="card card-outline card-danger">
                 <div class="card-header">
-                  <h3 class="card-title">Products</h3>
+                  <div class="card-title"><h3>IAB</h3></div>
+
+                  <div class="card-tools">
+                    <button
+                      type="button"
+                      class="btn btn-tool"
+                      data-card-widget="collapse"
+                    >
+                      <i class="fas fa-minus"></i>
+                    </button>
+                  </div>
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body">
                   <div id="toolbar">
                     <button id="add" class="btn btn-block btn-outline-success">
-                      <i class="glyphicon glyphicon-add"></i> Add
+                      <i class="glyphicon glyphicon-add"></i> Add new product
                     </button>
                   </div>
                   <table
@@ -92,25 +116,80 @@
                     data-show-fullscreen="true"
                     data-show-columns="true"
                     data-show-columns-toggle-all="true"
+                    data-show-print="true"
                     data-show-export="true"
                     data-click-to-select="true"
-                    data-detail-formatter="detailFormatter"
                     data-minimum-count-columns="2"
                     data-show-pagination-switch="true"
                     data-pagination="true"
                     data-id-field="id"
-                    data-page-list="[10, 25, 50, 100, all]"
+                    data-page-list="[5, 10, 25, all]"
                     data-show-footer="true"
-                    data-side-pagination="server"
-                    data-url="http://127.0.0.1:3000/api/"
+                    data-url="http://127.0.0.1:3000/api/iab/products"
                     data-response-handler="responseHandler"
-                    data-show-print="true"
                   ></table>
                 </div>
                 <!-- /.card-body -->
               </div>
               <!-- /.card -->
             </div>
+            <% } %>
+            <!-- /.col -->
+            <% if (user.access.site=='ALL' || user.access.site=='MEDICEF') { %>
+            <div class="col-12">
+              <!-- /.card -->
+
+              <div class="card card-outline card-danger">
+                <div class="card-header">
+                  <div class="card-title"><h3>Medicef</h3></div>
+
+                  <div class="card-tools">
+                    <button
+                      type="button"
+                      class="btn btn-tool"
+                      data-card-widget="collapse"
+                    >
+                      <i class="fas fa-minus"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                  <div id="toolbarMedicef">
+                    <button
+                      id="addMEDICEF"
+                      class="btn btn-block btn-outline-success"
+                    >
+                      <i class="glyphicon glyphicon-add"></i> Add new product
+                    </button>
+                  </div>
+                  <table
+                    id="medicef"
+                    data-toolbar="#toolbarMedicef"
+                    data-search="true"
+                    data-show-refresh="true"
+                    data-show-toggle="true"
+                    data-show-fullscreen="true"
+                    data-show-columns="true"
+                    data-show-columns-toggle-all="true"
+                    data-show-print="true"
+                    data-show-export="true"
+                    data-click-to-select="true"
+                    data-minimum-count-columns="2"
+                    data-show-pagination-switch="true"
+                    data-pagination="true"
+                    data-id-field="id"
+                    data-page-list="[5, 10, 25, all]"
+                    data-show-footer="true"
+                    data-url="http://127.0.0.1:3000/api/medicef/products"
+                    data-response-handler="responseHandler"
+                  ></table>
+                </div>
+                <!-- /.card-body -->
+              </div>
+              <!-- /.card -->
+            </div>
+            <% } %>
             <!-- /.col -->
           </div>
           <!-- /.row -->
@@ -131,6 +210,7 @@
     <script src="assets/plugins/jquery/jquery.min.js"></script>
     <!-- bootstrap-table  -->
     <script src="assets\plugins\bootstrap-table\dist\bootstrap-table.min.js"></script>
+
     <script src="assets\plugins\bootstrap-table\dist\extensions\export\bootstrap-table-export.min.js"></script>
     <script src="assets\plugins\bootstrap-table\dist\extensions\print\bootstrap-table-print.min.js"></script>
 
@@ -139,6 +219,7 @@
     <script src="assets\plugins\jquery-tableExport\tableExport.min.js"></script>
     <script src="assets\plugins\jquery-tableExport\libs\jsPDF\jspdf.min.js"></script>
     <script src="assets\plugins\jquery-tableExport\libs\jsPDF-AutoTable\jspdf.plugin.autotable.js"></script>
+
     <!-- sweetalert2  -->
     <script src="/assets/plugins/sweetalert2/sweetalert2.js"></script>
     <!-- hikma dashboard  -->
@@ -153,8 +234,10 @@
       $("#productsNav").addClass("active");
       $("#managementNav").addClass("active");
       var $table = $("#table");
+      var $medicefTable = $("#medicef");
 
       var $add = $("#add");
+      var $addMEDICEF = $("#addMEDICEF");
 
       function responseHandler(res) {
         $.each(res.rows, function (i, row) {
@@ -165,26 +248,128 @@
 
       function operateFormatter(value, row, index) {
         return [
-          '<a class="edit" href="javascript:void(0)" title="edit" >',
-          '<i class="fa fa-edit fa-lg" style="color:green"></i>',
-          "</a>  ",
-          '<a class="remove" href="javascript:void(0)" title="Remove">',
-          '<i class="fa fa-trash fa-lg" style="color:red"></i>',
-          "</a>",
+          '<div class="btn-group btn-group-sm">',
+          ' <a href="#" class="btn btn-info" id="edit"><i class="fas fa-edit"></i></a>',
+          '<a href="#" class="btn btn-danger"><i class="fas fa-trash"></i></a>',
+          "</div>",
         ].join("");
       }
 
-      window.operateEvents = {
-        "click .edit": function (e, value, row, index) {
-          $("#editEquipmentModal #name").val(row.name);
-          $("#editEquipmentModal #id").val(row._id);
+      function siteFormatter(value, row, index) {
+        if (value.toLowerCase() === "iab")
+          return ["<img src='/assets/dist/img/iab.jpg'></img>"].join("");
+        else if (value.toLowerCase() === "medicef")
+          return ["<img src='/assets/dist/img/medicef.jpg'></img>"].join("");
+        else
+          return [
+            "<img src='/assets/dist/img/medicef.jpg'></img><img src='/assets/dist/img/iab.jpg'></img>",
+          ].join("");
+      }
 
-          $("#editEquipmentModal").modal("toggle");
+      window.operateEvents = {
+        "click .btn-info": function (e, value, row, index) {
+          $("#editProductModal #name").val(row.name);
+          $("#editProductModal #id").val(row._id);
+
+          $("#editProductModal").modal("toggle");
+        },
+        "click .btn-danger": function (e, value, row, index) {
+          const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+              confirmButton: "btn btn-success",
+              cancelButton: "btn btn-danger",
+            },
+            buttonsStyling: false,
+          });
+
+          swalWithBootstrapButtons
+            .fire({
+              title: "Are you sure ?",
+              text: row.name + "  will be deleted !",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonText: "Yes, delete it!",
+              cancelButtonText: "No, cancel!",
+              reverseButtons: true,
+            })
+            .then((result) => {
+              if (result.value) {
+                $.ajax({
+                  url: "http://127.0.0.1:3000/api/iab/products/" + row._id,
+                  method: "delete",
+                  success: function (response) {
+                    $("#table").bootstrapTable("refresh");
+                    swalWithBootstrapButtons.fire(
+                      "Deleted!",
+                      "this Product has been deleted.",
+                      "success"
+                    );
+                  },
+                });
+              } else if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.cancel
+              ) {
+                swalWithBootstrapButtons.fire(
+                  "Cancelled",
+                  "this Product is safe",
+                  "error"
+                );
+              }
+            });
+        },
+      };
+      window.operateEventsMedicef = {
+        "click .edit": function (e, value, row, index) {
+          $("#editProductMedicefModal #name").val(row.name);
+          $("#editProductMedicefModal #id").val(row._id);
+
+          $("#editProductMedicefModal").modal("toggle");
         },
         "click .remove": function (e, value, row, index) {
-          $("#deleteEquipmentModal #id").val(row._id);
+          const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+              confirmButton: "btn btn-success",
+              cancelButton: "btn btn-danger",
+            },
+            buttonsStyling: false,
+          });
 
-          $("#deleteEquipmentModal").modal("toggle");
+          swalWithBootstrapButtons
+            .fire({
+              title: "Are you sure ?",
+              text: row.name + "  will be deleted !",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonText: "Yes, delete it!",
+              cancelButtonText: "No, cancel!",
+              reverseButtons: true,
+            })
+            .then((result) => {
+              if (result.value) {
+                $.ajax({
+                  url: "http://127.0.0.1:3000/api/medicef/products/" + row._id,
+                  method: "delete",
+                  success: function (response) {
+                    $("#medicef").bootstrapTable("refresh");
+                    swalWithBootstrapButtons.fire(
+                      "Deleted!",
+                      "this Product has been deleted.",
+                      "success"
+                    );
+                  },
+                });
+              } else if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.cancel
+              ) {
+                swalWithBootstrapButtons.fire(
+                  "Cancelled",
+                  "this Product is safe",
+                  "error"
+                );
+              }
+            });
         },
       };
 
@@ -202,7 +387,7 @@
           exportDataType: "all",
           exportOptions: {
             fileName: "Products",
-            ignoreColumn: ["operate"],
+            ignoreColumn: ["operate", "site"],
             jspdf: {
               format: "a4",
               margins: { left: 10, right: 10, top: 20, bottom: 20 },
@@ -218,21 +403,16 @@
               visible: false,
               printIgnore: true,
             },
-
             {
               field: "name",
-              title: "Item Name",
+              title: "Product name",
               sortable: true,
               footerFormatter: totalTextFormatter,
               align: "center",
+
+              valign: "middle",
             },
-            {
-              field: "addedDate",
-              title: "Date",
-              sortable: true,
-              align: "center",
-              footerFormatter: totalNameFormatter,
-            },
+
             {
               field: "operate",
               title: "Item Operate",
@@ -240,13 +420,64 @@
               clickToSelect: false,
               events: window.operateEvents,
               formatter: operateFormatter,
+              footerFormatter: totalNameFormatter,
               printIgnore: true,
+              valign: "middle",
             },
           ],
         });
 
         $add.click(function () {
-          $("#addEquipmentModal").modal("toggle");
+          $("#addProductModal").modal("toggle");
+        });
+
+        $medicefTable.bootstrapTable("destroy").bootstrapTable({
+          exportTypes: ["json", "xml", "csv", "txt", "sql", "excel", "pdf"],
+          exportDataType: "all",
+          exportOptions: {
+            fileName: "Products",
+            ignoreColumn: ["operate", "site"],
+            jspdf: {
+              format: "a4",
+              margins: { left: 10, right: 10, top: 20, bottom: 20 },
+            },
+          },
+
+          columns: [
+            {
+              title: "Item ID",
+              field: "_id",
+              align: "center",
+              valign: "middle",
+              visible: false,
+              printIgnore: true,
+            },
+            {
+              field: "name",
+              title: "Product name",
+              sortable: true,
+              footerFormatter: totalTextFormatter,
+              align: "center",
+
+              valign: "middle",
+            },
+
+            {
+              field: "operate",
+              title: "Item Operate",
+              align: "center",
+              clickToSelect: false,
+              events: window.operateEventsMedicef,
+              formatter: operateFormatter,
+              footerFormatter: totalNameFormatter,
+              printIgnore: true,
+              valign: "middle",
+            },
+          ],
+        });
+
+        $addMEDICEF.click(function () {
+          $("#addProductMedicefModal").modal("toggle");
         });
       }
       var Toast;
@@ -254,12 +485,12 @@
         initTable();
         Toast = Swal.mixin({
           toast: true,
-          position: "top-end",
+          position: "bottom-end",
           showConfirmButton: false,
           timer: 3000,
         });
       });
     </script>
-    <%- include('partials/modals') %>
+    <%- include('partials/modalsIAB') %> <%- include('partials/modalsMEDICEF')%>
   </body>
 </html>

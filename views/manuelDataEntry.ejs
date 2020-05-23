@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Hikma | Manuel Data entry</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/assets/dist/img/hikmaLogo2.png" />
+    <!-- Select2 -->
+    <link rel="stylesheet" href="/assets/plugins/select2/css/select2.min.css" />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="assets/plugins/fontawesome-free/css/all.min.css"
+    />
+    <!-- Ionicons -->
+    <link
+      rel="stylesheet"
+      href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="assets/plugins/icheck-bootstrap/icheck-bootstrap.min.css"
+    />
+    <!-- SweetAlert2 -->
+    <link
+      rel="stylesheet"
+      href="/assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css"
+    />
+    <!-- Theme style -->
+    <link rel="stylesheet" href="assets/dist/css/adminlte.min.css" />
+    <!-- Google Font: Source Sans Pro -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700"
+      rel="stylesheet"
+    />
+    <style>
+      .center {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        height: 45px;
+      }
+      .card-header#headingOne h2.mb-0 {
+        text-align-last: justify;
+      }
+    </style>
+  </head>
+  <body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+      <!-- Navbar -->
+      <%- include('partials/navBar') %>
+
+      <!-- /.navbar -->
+
+      <!-- Main Sidebar Container -->
+      <%- include('partials/sideBar') %>
+
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1>Manual Data Entry</h1>
+              </div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                  <li class="breadcrumb-item"><a href="#">Home</a></li>
+                  <li class="breadcrumb-item active">Manual Data Entry</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+          <!-- /.container-fluid -->
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+          <div class="row">
+            <div class="col-12">
+              <!-- /.card -->
+              <% if (user.access.site=="ALL" || user.access.site=='IAB') { %>
+
+              <div class="card card-outline card-danger" id="iab">
+                <div class="card-header" id="headingOne">
+                  <div class="card-title">
+                    <h3>IAB</h3>
+                  </div>
+                  <div class="card-tools">
+                    <button
+                      type="button"
+                      class="btn btn-tool"
+                      data-card-widget="collapse"
+                    >
+                      <i class="fas fa-minus"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                  <form role="form">
+                    <div class="card-body">
+                      <div class="form-group">
+                        <label for="datePicker">Date</label>
+                        <input
+                          type="date"
+                          id="datePicker"
+                          class="form-control"
+                        />
+                      </div>
+                      <div class="form-group">
+                        <label for="productSelect">Product</label>
+                        <select
+                          class="form-control select2 select2-danger"
+                          data-dropdown-css-class="select2-danger"
+                          style="width: 100%;"
+                          id="productSelect"
+                          name="productSelect"
+                        >
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label for="equipmentSelect">Equipment</label>
+                        <select
+                          class="form-control select2 select2-danger"
+                          data-dropdown-css-class="select2-danger"
+                          style="width: 100%;"
+                          id="equipmentSelect"
+                          name="equipmentSelect"
+                        >
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label for="shift">Shift</label>
+                        <select
+                          class="form-control select2 select2-danger"
+                          data-dropdown-css-class="select2-danger"
+                          style="width: 100%;"
+                          id="shift"
+                        >
+                          <option value="1">
+                            Shift A (start: <%= shift.iab.first.start %> end:
+                            <%= shift.iab.first.end %> )
+                          </option>
+                          <% if(shift.iab.number >= '2') {%>
+                          <option value="2">
+                            Shift B (start: <%= shift.iab.second.start %> end:
+                            <%= shift.iab.second.end %> )
+                          </option>
+                          <% } %> <% if(shift.iab.number == '3'){%>
+                          <option value="3">
+                            Shift C (start: <%= shift.iab.third.start %> end:
+                            <%= shift.iab.third.end %> )
+                          </option>
+
+                          <% } %>
+                        </select>
+                      </div>
+                      <!--<div class="form-group clearfix">
+                        <div class="row">
+                          <div class="col-2 align-self-center">
+                            <label for="time">Waiting for Materials</label>
+                          </div>
+                          <div class="col-1">
+                            <input
+                              class="form-control"
+                              type="text"
+                              name="time"
+                              id="timee"
+                            />
+                          </div>
+                        </div>
+                      </div>-->
+                      <div class="form-group clearfix">
+                        <div class="icheck-danger d-inline">
+                          <input
+                            type="checkbox"
+                            id="checkboxDanger1"
+                            data-toggle="collapse"
+                            data-target="#demo"
+                          />
+                          <label for="checkboxDanger1">
+                            Waiting for Materials
+                          </label>
+                          <div class="collapse" id="demo">
+                            <div class="row">
+                              <div class="col-1 align-self-center">
+                                Duration
+                              </div>
+                              <div class="col-1">
+                                <input
+                                  class="form-control"
+                                  type="text"
+                                  name="time"
+                                  id="time"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <br />
+
+                        <div class="icheck-danger d-inline">
+                          <input type="checkbox" id="checkboxDanger2" />
+                          <label for="checkboxDanger2">
+                            Waiting for operators</label
+                          >
+                        </div>
+                        <br />
+                        <div class="icheck-danger d-inline">
+                          <input type="checkbox" id="checkboxDanger3" />
+                          <label for="checkboxDanger3">
+                            Waiting for Quality
+                          </label>
+                        </div>
+                        <br />
+                        <div class="icheck-danger d-inline">
+                          <input type="checkbox" id="checkboxDanger4" />
+                          <label for="checkboxDanger4">
+                            Waiting for QVM
+                          </label>
+                        </div>
+                        <br />
+                        <div class="icheck-danger d-inline">
+                          <input type="checkbox" id="checkboxDanger5" />
+                          <label for="checkboxDanger5">
+                            Waiting for Maint.
+                          </label>
+                        </div>
+                      </div>
+                      <div class="form-group clearfix">
+                        <div class="icheck-danger d-inline">
+                          <input
+                            type="checkbox"
+                            checked=""
+                            id="lackOfElectricity"
+                          />
+                          <label for="lackOfElectricity">
+                            Lack of Electricity</label
+                          >
+                        </div>
+                        <br />
+
+                        <div class="icheck-danger d-inline">
+                          <input type="checkbox" id="lackOfAir" />
+                          <label for="lackOfAir"> Lack of comp.air</label>
+                        </div>
+                        <br />
+                        <div class="icheck-danger d-inline">
+                          <input type="checkbox" id="lackOfWater" />
+                          <label for="lackOfWater">
+                            Lack of water
+                          </label>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="numberOfBreakdowns"
+                          >Number of breakdowns
+                        </label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="numberOfBreakdowns"
+                          placeholder="Enter Number of breakdowns
+                          "
+                        />
+                      </div>
+                      <div class="form-group">
+                        <label for="plannedQty">Planned Qty </label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="plannedQty"
+                          placeholder="Enter planned Qty"
+                        />
+                      </div>
+                      <div class="form-group">
+                        <label
+                          for="producedQty
+                      "
+                          >Produced Qty
+                        </label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="producedQty"
+                          placeholder="Enter produced Qty"
+                        />
+                      </div>
+                    </div>
+                    <!-- /.card-body -->
+
+                    <button type="submit" class="btn btn-primary">
+                      Submit
+                    </button>
+                  </form>
+                </div>
+              </div>
+              <% } %> <% if (user.access.site=='ALL' ||
+              user.access.site=='MEDICEF') { %>
+
+              <!--!medicef-->
+              <div class="card card-outline card-danger" id="medicef">
+                <div class="card-header" id="headingOne">
+                  <div class="card-title">
+                    <h3>MEDICEF</h3>
+                  </div>
+                  <div class="card-tools">
+                    <button
+                      type="button"
+                      class="btn btn-tool"
+                      data-card-widget="collapse"
+                    >
+                      <i class="fas fa-minus"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                  <form role="form">
+                    <div class="card-body">
+                      <div class="form-group">
+                        <label for="datePicker">Date</label>
+                        <input
+                          type="date"
+                          id="datePicker"
+                          class="form-control"
+                        />
+                      </div>
+                      <div class="form-group">
+                        <label for="productSelect2">Product</label>
+                        <select
+                          class="form-control select2 select2-danger"
+                          data-dropdown-css-class="select2-danger"
+                          style="width: 100%;"
+                          id="productSelect2"
+                        >
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label for="shift">Shift</label>
+                        <select
+                          class="form-control select2 select2-danger"
+                          data-dropdown-css-class="select2-danger"
+                          style="width: 100%;"
+                          id="shift"
+                        >
+                          <option value="1">Shift A</option>
+                          <% if(shift.medicef.number >= '2') {%>
+                          <option value="2">Shift B</option>
+                          <% } %> <% if(shift.medicef.number == '3'){%>
+                          <option value="3">Shift C</option>
+
+                          <% } %>
+                        </select>
+                      </div>
+
+                      <div class="form-group clearfix">
+                        <div class="icheck-danger d-inline">
+                          <input
+                            type="checkbox"
+                            checked=""
+                            id="checkboxDanger1"
+                          />
+                          <label for="checkboxDanger1">
+                            Waiting for Materials</label
+                          >
+                        </div>
+                        <br />
+
+                        <div class="icheck-danger d-inline">
+                          <input type="checkbox" id="checkboxDanger2" />
+                          <label for="checkboxDanger2">
+                            Waiting for operators</label
+                          >
+                        </div>
+                        <br />
+                        <div class="icheck-danger d-inline">
+                          <input type="checkbox" id="checkboxDanger3" />
+                          <label for="checkboxDanger3">
+                            Waiting for Quality
+                          </label>
+                        </div>
+                        <br />
+                        <div class="icheck-danger d-inline">
+                          <input type="checkbox" id="checkboxDanger4" />
+                          <label for="checkboxDanger4">
+                            Waiting for QVM
+                          </label>
+                        </div>
+                        <br />
+                        <div class="icheck-danger d-inline">
+                          <input type="checkbox" id="checkboxDanger5" />
+                          <label for="checkboxDanger5">
+                            Waiting for Maint.
+                          </label>
+                        </div>
+                      </div>
+                      <div class="form-group clearfix">
+                        <div class="icheck-danger d-inline">
+                          <input
+                            type="checkbox"
+                            checked=""
+                            id="lackOfElectricity"
+                          />
+                          <label for="lackOfElectricity">
+                            Lack of Electricity</label
+                          >
+                        </div>
+                        <br />
+
+                        <div class="icheck-danger d-inline">
+                          <input type="checkbox" id="lackOfAir" />
+                          <label for="lackOfAir"> Lack of comp.air</label>
+                        </div>
+                        <br />
+                        <div class="icheck-danger d-inline">
+                          <input type="checkbox" id="lackOfWater" />
+                          <label for="lackOfWater">
+                            Lack of water
+                          </label>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="numberOfBreakdowns"
+                          >Number of breakdowns
+                        </label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="numberOfBreakdowns"
+                          placeholder="Enter Number of breakdowns
+                          "
+                        />
+                      </div>
+                      <div class="form-group">
+                        <label for="plannedQty">Planned Qty </label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="plannedQty"
+                          placeholder="Enter planned Qty"
+                        />
+                      </div>
+                      <div class="form-group">
+                        <label
+                          for="producedQty
+                      "
+                          >Produced Qty
+                        </label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="producedQty"
+                          placeholder="Enter produced Qty"
+                        />
+                      </div>
+                    </div>
+                    <!-- /.card-body -->
+
+                    <button type="submit" class="btn btn-primary">
+                      Submit
+                    </button>
+                  </form>
+                </div>
+              </div>
+              <% } %>
+
+              <!-- /.card -->
+            </div>
+          </div>
+          <!-- /.row -->
+        </section>
+        <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+
+      <!-- Control Sidebar -->
+      <aside class="control-sidebar control-sidebar-dark">
+        <!-- Control sidebar content goes here -->
+      </aside>
+      <!-- /.control-sidebar -->
+    </div>
+    <!-- ./wrapper -->
+
+    <!-- jQuery -->
+    <script src="assets/plugins/jquery/jquery.min.js"></script>
+
+    <!-- Bootstrap 4 -->
+    <script src="assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Select2 -->
+    <script src="assets/plugins/select2/js/select2.full.min.js"></script>
+
+    <!-- sweetalert2  -->
+    <script src="/assets/plugins/sweetalert2/sweetalert2.js"></script>
+
+    <script src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>
+
+    <!-- hikma dashboard  -->
+    <script src="/assets/dist/js/pages/dashboard.js"></script>
+    <!-- hikma App -->
+    <script src="assets/dist/js/adminlte.min.js"></script>
+    <!-- hikma for demo purposes -->
+    <script src="assets/dist/js/demo.js"></script>
+    <!-- page script -->
+    <script>
+      Date.prototype.toDateInputValue = function () {
+        var local = new Date(this);
+        local.setMinutes(this.getMinutes() - this.getTimezoneOffset());
+        return local.toJSON().slice(0, 10);
+      };
+      $("#manuelDataNav").addClass("active");
+      $("#navtree").removeClass("menu-open");
+      var d;
+      $(function () {
+        var checkboxes = document.getElementsByTagName("input");
+
+        for (var i = 0; i < checkboxes.length; i++) {
+          if (checkboxes[i].type == "checkbox") {
+            checkboxes[i].checked = false;
+          }
+        }
+        $("#time")
+          .inputmask("datetime", {
+            mask: "h:s",
+            placeholder: "hh:mm",
+          })
+          .val("00:00");
+
+        var data = $.ajax({
+          url: "http://127.0.0.1:3000/api/iab/products/",
+          dataType: "json",
+          type: "GET",
+          success: function (data) {
+            var re = $.map(data, function (obj) {
+              obj.id = obj._id;
+              obj.text = obj.name;
+              delete obj._id;
+              delete obj.name;
+              delete obj.__v;
+
+              return obj;
+            });
+
+            $("#productSelect").select2({ data: re });
+          },
+        });
+        var dataEquipment = $.ajax({
+          url: "http://127.0.0.1:3000/api/iab/equipments",
+          dataType: "json",
+          type: "GET",
+          success: function (data) {
+            var re = $.map(data, function (obj) {
+              obj.id = obj._id;
+              obj.text = obj.name;
+              delete obj._id;
+              delete obj.name;
+              delete obj.__v;
+              delete obj.addedDate;
+              delete obj.type;
+              return obj;
+            });
+
+            $("#equipmentSelect").select2({ data: re });
+          },
+        });
+        $("#iab #datePicker").val(new Date().toDateInputValue());
+        //medicef
+        var data = $.ajax({
+          url: "http://127.0.0.1:3000/api/medicef/products/",
+          dataType: "json",
+          type: "GET",
+          success: function (data) {
+            var re = $.map(data, function (obj) {
+              obj.id = obj._id;
+              obj.text = obj.name;
+              delete obj._id;
+              delete obj.name;
+              delete obj.__v;
+
+              return obj;
+            });
+
+            $("#productSelect2").select2({ data: re });
+          },
+        });
+        $("#medicef #datePicker").val(new Date().toDateInputValue());
+      });
+    </script>
+  </body>
+</html>

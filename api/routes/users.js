@@ -4,14 +4,51 @@ const users = require("./../../config/database.js");
 
 // Getting all
 router.get("/", async (req, res) => {
+  /*try {
+    users.insertMany([
+      {
+        access: { site: "all", type: "MANAGER" },
+        name: "Chaima fourati",
+        email: "Chaima23@hikma.com",
+        password:
+          "$2b$10$rQJcy5d7Jq/76.CIU6qJc.onGjH236NhwVycFG7NB.uGFu6MWbzzq",
+        department: "production",
+        phone: 55721212,
+      },
+      {
+        access: { site: "all", type: "READONLY" },
+        name: "khaled yessine",
+        email: "khaled32@hikma.com",
+        password:
+          "$2b$10$rQJcy5d7Jq/76.CIU6qJc.onGjH236NhwVycFG7NB.uGFu6MWbzzq",
+        department: "production",
+        phone: 55721212,
+      },
+      {
+        access: { site: "all", type: "READONLY" },
+        name: "samir Snoussii",
+        email: "samir23@hikma.com",
+        password:
+          "$2b$10$rQJcy5d7Jq/76.CIU6qJc.onGjH236NhwVycFG7NB.uGFu6MWbzzq",
+        department: "production",
+        phone: 55721212,
+      },
+      {
+        access: { site: "all", type: "READONLY" },
+        name: "haifa dima",
+        email: "haifa32@hikma.com",
+        password:
+          "$2b$10$rQJcy5d7Jq/76.CIU6qJc.onGjH236NhwVycFG7NB.uGFu6MWbzzq",
+        department: "production",
+        phone: 55721212,
+      },
+    ]);
+  } catch (e) {
+    print(e);
+  }*/
   var userss;
   try {
-    if (req.query.search) {
-      var regexp = new RegExp("^" + req.query.search.toLowerCase(), "i");
-      userss = await users.find({
-        name: regexp,
-      });
-    } else userss = await users.find();
+    userss = await users.find();
     res.json(userss);
   } catch (err) {
     res.status(500).json({ message: err.message });

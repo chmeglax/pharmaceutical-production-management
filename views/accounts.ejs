@@ -40,7 +40,7 @@
       img {
         border-radius: 4px;
         padding: 3px;
-        width: 45px;
+        height: 35px;
       }
     </style>
     <link
@@ -85,9 +85,19 @@
             <div class="col-12">
               <!-- /.card -->
 
-              <div class="card">
+              <div class="card card-outline card-danger">
                 <div class="card-header">
-                  <h3 class="card-title">Accounts</h3>
+                  <div class="card-title"><h3>All Accounts</h3></div>
+
+                  <div class="card-tools">
+                    <button
+                      type="button"
+                      class="btn btn-tool"
+                      data-card-widget="collapse"
+                    >
+                      <i class="fas fa-minus"></i>
+                    </button>
+                  </div>
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body">
@@ -113,14 +123,12 @@
                     data-show-print="true"
                     data-show-export="true"
                     data-click-to-select="true"
-                    data-detail-formatter="detailFormatter"
                     data-minimum-count-columns="2"
                     data-show-pagination-switch="true"
                     data-pagination="true"
                     data-id-field="id"
-                    data-page-list="[10, 25, 50, 100, all]"
+                    data-page-list="[5, 10, 25, all]"
                     data-show-footer="true"
-                    data-side-pagination="server"
                     data-url="http://127.0.0.1:3000/api/users"
                     data-response-handler="responseHandler"
                   ></table>
@@ -149,6 +157,7 @@
     <script src="assets/plugins/jquery/jquery.min.js"></script>
     <!-- bootstrap-table  -->
     <script src="assets\plugins\bootstrap-table\dist\bootstrap-table.min.js"></script>
+
     <script src="assets\plugins\bootstrap-table\dist\extensions\export\bootstrap-table-export.min.js"></script>
     <script src="assets\plugins\bootstrap-table\dist\extensions\print\bootstrap-table-print.min.js"></script>
 
@@ -157,6 +166,7 @@
     <script src="assets\plugins\jquery-tableExport\tableExport.min.js"></script>
     <script src="assets\plugins\jquery-tableExport\libs\jsPDF\jspdf.min.js"></script>
     <script src="assets\plugins\jquery-tableExport\libs\jsPDF-AutoTable\jspdf.plugin.autotable.js"></script>
+
     <!-- sweetalert2  -->
     <script src="/assets/plugins/sweetalert2/sweetalert2.js"></script>
     <!-- hikma dashboard  -->
@@ -184,37 +194,50 @@
       function operateFormatter(value, row, index) {
         if (row.access.type === "admin")
           return [
-            '<a class="edit" href="javascript:void(0)" title="edit" >',
-            '<i class="fa fa-edit fa-lg" style="color:green"></i>',
-            "</a>  ",
+            '<div class="btn-group btn-group-sm">',
+            ' <a href="#" class="btn btn-info" id="edit"><i class="fas fa-edit"></i></a>',
+            "</div>",
           ].join("");
         else
           return [
-            '<a class="edit" href="javascript:void(0)" title="edit" >',
-            '<i class="fa fa-edit fa-lg" style="color:green"></i>',
-            "</a>  ",
-            '<a class="remove" href="javascript:void(0)" title="Remove">',
-            '<i class="fa fa-trash fa-lg" style="color:red"></i>',
-            "</a>",
+            '<div class="btn-group btn-group-sm">',
+            ' <a href="#" class="btn btn-info" id="edit"><i class="fas fa-edit"></i></a>',
+            '<a href="#" class="btn btn-danger"><i class="fas fa-trash"></i></a>',
+            "</div>",
           ].join("");
       }
       function typeFormatter(value, row, index) {
         var classs;
-        switch (value) {
-          case "admin": {
+        var access = value.toUpperCase();
+        switch (access) {
+          case "ADMIN": {
             classs = "bg-success";
             break;
           }
 
-          case "user":
+          case "USER":
+            classs = "bg-info";
+            break;
+          case "PRODUCTION":
             classs = "bg-warning";
+            break;
+          case "MANAGER":
+            classs = "bg-primary";
+            break;
+          case "READONLY":
+            classs = "bg-secondary";
+            break;
+          case "SUPERVISOR":
+            classs = "bg-danger";
             break;
           default:
           // code block
         }
-        return ['<span class="badge ' + classs + '">', value, "</span>"].join(
-          ""
-        );
+        return [
+          '<span class="badge ' + classs + '">',
+          access.toUpperCase(),
+          "</span>",
+        ].join("");
       }
       function siteFormatter(value, row, index) {
         if (value.toLowerCase() === "iab")
@@ -228,7 +251,7 @@
       }
 
       window.operateEvents = {
-        "click .edit": function (e, value, row, index) {
+        "click .btn-info": function (e, value, row, index) {
           console.log(row);
           $("#editUserModal #name").val(row.name);
           $("#editUserModal #id").val(row._id);
@@ -240,7 +263,7 @@
 
           $("#editUserModal").modal("toggle");
         },
-        "click .remove": function (e, value, row, index) {
+        "click .btn-danger": function (e, value, row, index) {
           const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
               confirmButton: "btn btn-success",
@@ -251,8 +274,8 @@
 
           swalWithBootstrapButtons
             .fire({
-              title: "Are you sure?",
-              text: "You won't be able to revert this!",
+              title: "Are you sure ?",
+              text: row.name + "  will be deleted and lose access !",
               icon: "warning",
               showCancelButton: true,
               confirmButtonText: "Yes, delete it!",
@@ -279,7 +302,7 @@
               ) {
                 swalWithBootstrapButtons.fire(
                   "Cancelled",
-                  "this account is safe :)",
+                  "this account is safe",
                   "error"
                 );
               }
@@ -401,6 +424,6 @@
         });
       });
     </script>
-    <%- include('partials/modals') %>
+    <%- include('partials/modalsIAB') %> <%- include('partials/modalsMEDICEF')%>
   </body>
 </html>

@@ -1,17 +1,16 @@
 const express = require("express");
 const router = express.Router();
-const Equipments = require("./../models/equipment");
+const Equipments = require("../models/MEDICEFequipment");
 
 // Getting all
 router.get("/", async (req, res) => {
   var Equipmentss;
   try {
-    if (req.query.search) {
-      var regexp = new RegExp("^" + req.query.search);
-      Equipmentss = await Equipments.find({
-        name: regexp,
-      });
-    } else Equipmentss = await Equipments.find();
+    /*  Equipments.insertMany([
+      { name: "test", type: "packaging" },
+      { name: "test2", type: "packaging" },
+    ]);*/
+    Equipmentss = await Equipments.find();
     res.json(Equipmentss);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -27,6 +26,7 @@ router.get("/:id", getEquipments, (req, res) => {
 router.post("/", async (req, res) => {
   const Equipment = new Equipments({
     name: req.body.name,
+    type: req.body.type,
   });
   try {
     const newEquipments = await Equipment.save();
@@ -40,6 +40,7 @@ router.post("/", async (req, res) => {
 router.patch("/:id", getEquipments, async (req, res) => {
   if (req.body.name != null) {
     res.Equipments.name = req.body.name;
+    res.Equipments.type = req.body.type;
   }
   try {
     const updatedEquipments = await res.Equipments.save();

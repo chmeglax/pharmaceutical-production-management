@@ -10,7 +10,11 @@ const equipmentSchema = new mongoose.Schema({
     required: true,
     default: Date.now,
   },
+  type: {
+    type: String,
+    required: true,
+  },
 });
 /*equipmentSchema.index({ name: "text", subscribedToChannel: "text" });
 equipmentSchema.index({ "$**": "text" });*/
-module.exports = mongoose.model("Equipments", equipmentSchema);
+module.exports = mongoose.model("MEDICEFEquipments", equipmentSchema);

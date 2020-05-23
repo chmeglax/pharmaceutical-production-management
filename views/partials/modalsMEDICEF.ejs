@@ -1,0 +1,307 @@
+<!--!EQUIPMENTS-->
+
+<!-- addEquipmentMedicefModal Modal HTML -->
+<div id="addEquipmentMedicefModal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" action="/api/">
+        <div class="modal-header">
+          <h4 class="modal-title">Add Equipment to Medicef</h4>
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-hidden="true"
+          >
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Name</label>
+            <input
+              type="text"
+              class="form-control"
+              name="name"
+              id="name"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>type</label>
+            <select class="custom-select" id="type" required>
+              <option value="packaging">Packaging</option>
+              <option value="utility">Utility</option>
+              <option value="processing">Processing</option>
+              <option value="ouality">Quality</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <input
+            type="button"
+            class="btn btn-default"
+            data-dismiss="modal"
+            value="Cancel"
+          />
+          <input
+            type="button"
+            class="btn btn-success"
+            value="Add"
+            onclick="addEquipmentMedicef()"
+          />
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- editEquipmentModal Modal HTML -->
+<div id="editEquipmentMedicefModal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form>
+        <div class="modal-header">
+          <h4 class="modal-title">edit Medicef Equipment</h4>
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-hidden="true"
+          >
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <input type="text" id="id" class="form-control" hidden />
+          </div>
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" id="name" class="form-control" required />
+          </div>
+          <div class="form-group">
+            <label>type</label>
+            <select class="custom-select" id="type" required>
+              <option value="packaging">Packaging</option>
+              <option value="utility">Utility</option>
+              <option value="processing">Processing</option>
+              <option value="ouality">Quality</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <input
+            type="button"
+            class="btn btn-default"
+            data-dismiss="modal"
+            value="Cancel"
+          />
+          <input
+            type="button"
+            class="btn btn-info"
+            value="Save"
+            onclick="updateEquipmentMedicef()"
+          />
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function updateEquipmentMedicef() {
+    var name = $("#editEquipmentMedicefModal #name").val();
+    var id = $("#editEquipmentMedicefModal #id").val();
+    var type = $("#editEquipmentMedicefModal #type")
+      .children("option:selected")
+      .val();
+
+    $.ajax({
+      url: "http://127.0.0.1:3000/api/medicef/equipments/" + id,
+      method: "patch",
+      data: {
+        name: name,
+        type: type,
+      },
+      success: function (response) {
+        $("#medicef").bootstrapTable("refresh");
+        $("#editEquipmentMedicefModal").modal("toggle");
+        Toast.fire({
+          type: "success",
+          title: "Product " + name + " updated successfully",
+        });
+      },
+    });
+  }
+  function addEquipmentMedicef() {
+    var name = $("#addEquipmentMedicefModal #name").val();
+    var type = $("#editEquipmentMedicefModal #type")
+      .children("option:selected")
+      .val();
+
+    $.ajax({
+      url: "http://127.0.0.1:3000/api/medicef/equipments/",
+      method: "post",
+      data: {
+        name: name,
+        type: type,
+      },
+      success: function (response) {
+        $("#medicef").bootstrapTable("refresh");
+        $("#addEquipmentMedicefModal").modal("toggle");
+        Toast.fire({
+          type: "success",
+          title: "Equipment " + name + " added successfully",
+        });
+      },
+    });
+  }
+</script>
+
+<!--!PRODUCTS-->
+
+<!-- addProductModal Modal HTML -->
+<div id="addProductMedicefModal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" action="/api/">
+        <div class="modal-header">
+          <h4 class="modal-title">Add Product to Medicef</h4>
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-hidden="true"
+          >
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Name</label>
+            <input
+              type="text"
+              class="form-control"
+              name="name"
+              id="name"
+              required
+            />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <input
+            type="button"
+            class="btn btn-default"
+            data-dismiss="modal"
+            value="Cancel"
+          />
+          <input
+            type="button"
+            class="btn btn-success"
+            value="Add"
+            onclick="addProductMedicef()"
+          />
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- editProductModal Modal HTML -->
+<div id="editProductMedicefModal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form>
+        <div class="modal-header">
+          <h4 class="modal-title">edit Medicef Product</h4>
+          <button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-hidden="true"
+          >
+            &times;
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <input type="text" id="id" class="form-control" hidden />
+          </div>
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" id="name" class="form-control" required />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <input
+            type="button"
+            class="btn btn-default"
+            data-dismiss="modal"
+            value="Cancel"
+          />
+          <input
+            type="button"
+            class="btn btn-info"
+            value="Save"
+            onclick="updateProductMedicef()"
+          />
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+  function updateProductMedicef() {
+    var name = $("#editProductMedicefModal #name").val();
+    var id = $("#editProductMedicefModal #id").val();
+    $.ajax({
+      url: "http://127.0.0.1:3000/api/medicef/products/" + id,
+      method: "patch",
+      data: {
+        name: name,
+      },
+      success: function (response) {
+        $("#medicef").bootstrapTable("refresh");
+        $("#editProductMedicefModal").modal("toggle");
+        Toast.fire({
+          type: "success",
+          title: "Product " + name + " updated successfully",
+        });
+      },
+      error: function (request, error) {
+        Toast.fire({
+          type: "error",
+          title: "Problem accured, try again later",
+        });
+      },
+    });
+  }
+  function addProductMedicef() {
+    var name = $("#addProductMedicefModal #name").val();
+
+    $.ajax({
+      url: "http://127.0.0.1:3000/api/medicef/products/",
+      method: "post",
+      data: {
+        name: name,
+      },
+
+      success: function (response) {
+        $("#medicef").bootstrapTable("refresh");
+        $("#addProductMedicefModal").modal("toggle");
+        Toast.fire({
+          type: "success",
+          title: "Product " + name + " added successfully",
+        });
+      },
+      error: function (e) {
+        //var resp = error.responseJSON.msg;
+        Toast.fire({
+          type: "error",
+          title: "Problem accured, try again later ",
+        });
+      },
+    });
+  }
+</script>

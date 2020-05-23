@@ -35,6 +35,17 @@
       href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700"
       rel="stylesheet"
     />
+    <style>
+      .center {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        height: 45px;
+      }
+      .card-header#headingOne h2.mb-0 {
+        text-align-last: justify;
+      }
+    </style>
   </head>
   <body class="hold-transition sidebar-mini">
     <div class="wrapper">
@@ -69,18 +80,35 @@
         <!-- Main content -->
         <section class="content">
           <div class="row">
+            <% if (user.access.site=="ALL" || user.access.site=='IAB') { %>
+
             <div class="col-12">
               <!-- /.card -->
 
-              <div class="card">
-                <div class="card-header">
-                  <h3 class="card-title">Equipments</h3>
+              <div class="card card-outline card-danger">
+                <div class="card-header" id="headingOne">
+                  <div class="card-title">
+                    <h3>IAB</h3>
+                  </div>
+                  <div class="card-tools">
+                    <button
+                      type="button"
+                      class="btn btn-tool"
+                      data-card-widget="collapse"
+                    >
+                      <i class="fas fa-minus"></i>
+                    </button>
+                  </div>
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body">
                   <div id="toolbar">
-                    <button id="add" class="btn btn-block btn-outline-success">
-                      <i class="glyphicon glyphicon-add"></i> Add
+                    <button
+                      id="addIAB"
+                      class="btn btn-block btn-outline-success"
+                    >
+                      <i class="glyphicon glyphicon-add"></i> Add new equipment
+                      to IAB
                     </button>
                   </div>
                   <table
@@ -101,17 +129,71 @@
                     data-id-field="id"
                     data-page-list="[10, 25, 50, 100, all]"
                     data-show-footer="true"
-                    data-side-pagination="server"
-                    data-url="http://127.0.0.1:3000/api/equipments/"
+                    data-url="http://127.0.0.1:3000/api/iab/equipments/"
+                    data-response-handler="responseHandler"
+                    data-show-print="true"
+                  ></table>
+                </div>
+              </div>
+            </div>
+            <% } %> <% if (user.access.site=='ALL' ||
+            user.access.site=='MEDICEF') { %>
+
+            <div class="col-12">
+              <div class="card card-outline card-danger">
+                <div class="card-header">
+                  <div class="card-title"><h3>Medicef</h3></div>
+
+                  <div class="card-tools">
+                    <button
+                      type="button"
+                      class="btn btn-tool"
+                      data-card-widget="collapse"
+                    >
+                      <i class="fas fa-minus"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body">
+                  <div id="toolbarMedicef">
+                    <button
+                      id="addMEDICEF"
+                      class="btn btn-block btn-outline-success"
+                    >
+                      <i class="glyphicon glyphicon-add"></i> Add new equipment
+                      to Medicef
+                    </button>
+                  </div>
+                  <table
+                    id="medicef"
+                    data-toolbar="#toolbarMedicef"
+                    data-search="true"
+                    data-show-refresh="true"
+                    data-show-toggle="true"
+                    data-show-fullscreen="true"
+                    data-show-columns="true"
+                    data-show-columns-toggle-all="true"
+                    data-show-export="true"
+                    data-click-to-select="true"
+                    data-detail-formatter="detailFormatter"
+                    data-minimum-count-columns="2"
+                    data-show-pagination-switch="true"
+                    data-pagination="true"
+                    data-id-field="id"
+                    data-page-list="[10, 25, 50, 100, all]"
+                    data-show-footer="true"
+                    data-url="http://127.0.0.1:3000/api/medicef/equipments/"
                     data-response-handler="responseHandler"
                     data-show-print="true"
                   ></table>
                 </div>
                 <!-- /.card-body -->
               </div>
-              <!-- /.card -->
             </div>
-            <!-- /.col -->
+            <% } %>
+
+            <!-- /.card -->
           </div>
           <!-- /.row -->
         </section>
@@ -153,9 +235,10 @@
       $("#equipmentsNav").addClass("active");
       $("#managementNav").addClass("active");
       var $table = $("#table");
+      var $medicefTable = $("#medicef");
 
-      var $add = $("#add");
-
+      var $addIAB = $("#addIAB");
+      var $addMEDICEF = $("#addMEDICEF");
       function responseHandler(res) {
         $.each(res.rows, function (i, row) {
           row.state = $.inArray(row._id, selections) !== -1;
@@ -165,26 +248,120 @@
 
       function operateFormatter(value, row, index) {
         return [
-          '<a class="edit" href="javascript:void(0)" title="edit" >',
-          '<i class="fa fa-edit fa-lg" style="color:green"></i>',
-          "</a>  ",
-          '<a class="remove" href="javascript:void(0)" title="Remove">',
-          '<i class="fa fa-trash fa-lg" style="color:red"></i>',
-          "</a>",
+          '<div class="btn-group btn-group-sm">',
+          ' <a href="#" class="btn btn-info" id="edit"><i class="fas fa-edit"></i></a>',
+          '<a href="#" class="btn btn-danger"><i class="fas fa-trash"></i></a>',
+          "</div>",
         ].join("");
       }
 
       window.operateEvents = {
-        "click .edit": function (e, value, row, index) {
+        "click .btn-info": function (e, value, row, index) {
           $("#editEquipmentModal #name").val(row.name);
+          //$("#editEquipmentModal #type").val(row.type.toLowerCase());
           $("#editEquipmentModal #id").val(row._id);
 
           $("#editEquipmentModal").modal("toggle");
         },
-        "click .remove": function (e, value, row, index) {
-          $("#deleteEquipmentModal #id").val(row._id);
+        "click .btn-danger": function (e, value, row, index) {
+          const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+              confirmButton: "btn btn-success",
+              cancelButton: "btn btn-danger",
+            },
+            buttonsStyling: false,
+          });
 
-          $("#deleteEquipmentModal").modal("toggle");
+          swalWithBootstrapButtons
+            .fire({
+              title: "Are you sure ?",
+              text: row.name + "  will be deleted !",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonText: "Yes, delete it!",
+              cancelButtonText: "No, cancel!",
+              reverseButtons: true,
+            })
+            .then((result) => {
+              if (result.value) {
+                $.ajax({
+                  url: "http://127.0.0.1:3000/api/iab/equipments/" + row._id,
+                  method: "delete",
+                  success: function (response) {
+                    $("#table").bootstrapTable("refresh");
+                    swalWithBootstrapButtons.fire(
+                      "Deleted!",
+                      row.name + " has been deleted.",
+                      "success"
+                    );
+                  },
+                });
+              } else if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.cancel
+              ) {
+                swalWithBootstrapButtons.fire(
+                  "Cancelled",
+                  "this equipment is safe",
+                  "error"
+                );
+              }
+            });
+        },
+      };
+      window.operateEventsMedicef = {
+        "click .edit": function (e, value, row, index) {
+          $("#editEquipmentMedicefModal #name").val(row.name);
+          //$("#editEquipmentModal #type").val(row.type.toLowerCase());
+          $("#editEquipmentMedicefModal #id").val(row._id);
+
+          $("#editEquipmentMedicefModal").modal("toggle");
+        },
+        "click .remove": function (e, value, row, index) {
+          const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+              confirmButton: "btn btn-success",
+              cancelButton: "btn btn-danger",
+            },
+            buttonsStyling: false,
+          });
+
+          swalWithBootstrapButtons
+            .fire({
+              title: "Are you sure ?",
+              text: row.name + "  will be deleted !",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonText: "Yes, delete it!",
+              cancelButtonText: "No, cancel!",
+              reverseButtons: true,
+            })
+            .then((result) => {
+              if (result.value) {
+                $.ajax({
+                  url:
+                    "http://127.0.0.1:3000/api/medicef/equipments/" + row._id,
+                  method: "delete",
+                  success: function (response) {
+                    $("#table").bootstrapTable("refresh");
+                    swalWithBootstrapButtons.fire(
+                      "Deleted!",
+                      row.name + " has been deleted.",
+                      "success"
+                    );
+                  },
+                });
+              } else if (
+                /* Read more about handling dismissals below */
+                result.dismiss === Swal.DismissReason.cancel
+              ) {
+                swalWithBootstrapButtons.fire(
+                  "Cancelled",
+                  "this equipment is safe",
+                  "error"
+                );
+              }
+            });
         },
       };
 
@@ -221,18 +398,19 @@
 
             {
               field: "name",
-              title: "Item Name",
+              title: "Equipment Name",
               sortable: true,
               footerFormatter: totalTextFormatter,
               align: "center",
             },
             {
-              field: "addedDate",
-              title: "Date",
+              field: "type",
+              title: "Type",
               sortable: true,
               align: "center",
               footerFormatter: totalNameFormatter,
             },
+
             {
               field: "operate",
               title: "Item Operate",
@@ -245,8 +423,60 @@
           ],
         });
 
-        $add.click(function () {
+        $medicefTable.bootstrapTable("destroy").bootstrapTable({
+          exportTypes: ["json", "xml", "csv", "txt", "sql", "excel", "pdf"],
+          exportDataType: "all",
+          exportOptions: {
+            fileName: "equipments",
+            ignoreColumn: ["operate"],
+            jspdf: {
+              format: "a4",
+              margins: { left: 10, right: 10, top: 20, bottom: 20 },
+            },
+          },
+
+          columns: [
+            {
+              title: "Item ID",
+              field: "_id",
+              align: "center",
+              valign: "middle",
+              visible: false,
+              printIgnore: true,
+            },
+
+            {
+              field: "name",
+              title: "Equipment Name",
+              sortable: true,
+              footerFormatter: totalTextFormatter,
+              align: "center",
+            },
+            {
+              field: "type",
+              title: "Type",
+              sortable: true,
+              align: "center",
+              footerFormatter: totalNameFormatter,
+            },
+
+            {
+              field: "operate",
+              title: "Item Operate",
+              align: "center",
+              clickToSelect: false,
+              events: window.operateEventsMedicef,
+              formatter: operateFormatter,
+              printIgnore: true,
+            },
+          ],
+        });
+
+        $addIAB.click(function () {
           $("#addEquipmentModal").modal("toggle");
+        });
+        $addMEDICEF.click(function () {
+          $("#addEquipmentMedicefModal").modal("toggle");
         });
       }
       var Toast;
@@ -260,6 +490,7 @@
         });
       });
     </script>
-    <%- include('partials/modals') %>
+    <%- include('partials/modalsIAB') %> <%- include('partials/modalsMEDICEF')
+    %>
   </body>
 </html>

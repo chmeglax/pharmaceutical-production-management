@@ -10,11 +10,14 @@ var handlebars = require("express-handlebars");
 const passport = require("passport");
 const cookieParser = require("cookie-parser");
 var bodyParser = require("body-parser");
+var getJSON = require("get-json");
+//!models
+const IABshifts = require("./api/models/IABshifts.js");
+const MEDICEFshifts = require("./api/models/MEDICEFshifts");
 
 const session = require("express-session");
 const flash = require("express-flash");
 const User = require("./config/database.js");
-
 app.set("view engine", "ejs");
 app.use("/assets", express.static("assets"));
 app.use("/node_modules", express.static("node_modules"));
@@ -27,10 +30,21 @@ app.use(express.json());
 // Enables express to parse body data from x-www-form-encoded data
 app.use(bodyParser.urlencoded({ extended: true }));
 //!API
-const apiRouterEquipments = require("./api/routes/equipments");
-app.use("/api/equipments", apiRouterEquipments);
+const apiIABEquipments = require("./api/routes/IABequipments");
+app.use("/api/iab/equipments", apiIABEquipments);
+const apiMedocefEquipments = require("./api/routes/MEDICEFequipments");
+app.use("/api/medicef/equipments", apiMedocefEquipments);
 const apiRouterUsers = require("./api/routes/users");
 app.use("/api/users", apiRouterUsers);
+const apiIABProducts = require("./api/routes/IABproducts");
+app.use("/api/iab/products", apiIABProducts);
+const apiMedicefProducts = require("./api/routes/MEDICEFproducts");
+app.use("/api/medicef/products", apiMedicefProducts);
+
+const apiIABshifts = require("./api/routes/IABshifts");
+app.use("/api/iab/shifts", apiIABshifts);
+const apiMEDICEFshifts = require("./api/routes/MEDICEFshifts");
+app.use("/api/medicef/shifts", apiMEDICEFshifts);
 
 const initializePassport = require("./config/passport-config");
 /*initializePassport(
@@ -72,42 +86,119 @@ const hostname = "127.0.0.1";
 const port = 3000;
 
 app.get("/", checkAuthenticated, function (req, res) {
-  res.render("home", { user: req.user.name, title: "homepage" });
+  res.render("home", { user: req.user, title: "homepage" });
 });
 //testing purpose
 app.get("/test", checkAuthenticated, function (req, res) {
   res.render("test");
 });
 app.get("/accounts", isAdmin, function (req, res) {
-  res.render("accounts", { user: req.user.name });
+  res.render("accounts", { user: req.user });
 });
 app.get("/equipments", checkAuthenticated, function (req, res) {
-  res.render("equipments", { user: req.user.name });
+  res.render("equipments", { user: req.user });
 });
+app.get("/reports", checkAuthenticated, function (req, res) {
+  var shiftAll = {};
+
+  getJSON("http://127.0.0.1:3000/api/iab/shifts/", function (error, iab) {
+    getJSON("http://127.0.0.1:3000/api/medicef/shifts/", function (
+      error,
+      medicef
+    ) {
+      switch (iab.number) {
+        case "1":
+          iab.type = "Extended";
+          break;
+        case "2":
+          iab.type = "Two shifts";
+          break;
+        default:
+          iab.type = "Three shifts";
+          break;
+      }
+      switch (medicef.number) {
+        case "1":
+          medicef.type = "Extended";
+          break;
+        case "2":
+          medicef.type = "Two shifts";
+          break;
+        default:
+          medicef.type = "Three shifts";
+          break;
+      }
+      res.render("reports", {
+        user: req.user,
+        shift: { iab: iab, medicef: medicef },
+      });
+    });
+  });
+});
+
 app.get("/shifts", checkAuthenticated, function (req, res) {
-  res.render("shifts", { user: req.user.name });
+  var shiftAll = {};
+
+  getJSON("http://127.0.0.1:3000/api/iab/shifts/", function (error, iab) {
+    getJSON("http://127.0.0.1:3000/api/medicef/shifts/", function (
+      error,
+      medicef
+    ) {
+      switch (iab.number) {
+        case "1":
+          iab.type = "Extended";
+          break;
+        case "2":
+          iab.type = "Two shifts";
+          break;
+        default:
+          iab.type = "Three shifts";
+          break;
+      }
+      switch (medicef.number) {
+        case "1":
+          medicef.type = "Extended";
+          break;
+        case "2":
+          medicef.type = "Two shifts";
+          break;
+        default:
+          medicef.type = "Three shifts";
+          break;
+      }
+      res.render("shifts", {
+        user: req.user,
+        shift: { iab: iab, medicef: medicef },
+      });
+    });
+  });
 });
 app.get("/products", checkAuthenticated, function (req, res) {
-  res.render("products", { user: req.user.name });
+  res.render("products", { user: req.user });
 });
 app.get("/operators", checkAuthenticated, function (req, res) {
-  res.render("operators", { user: req.user.name });
+  res.render("operators", { user: req.user });
 });
 app.get("/statistiques", checkAuthenticated, function (req, res) {
-  res.render("statistiques", { user: req.user.name });
+  res.render("statistiques", { user: req.user });
+});
+app.get("/manueldata", checkAuthenticated, function (req, res) {
+  getJSON("http://127.0.0.1:3000/api/iab/shifts/", function (error, iab) {
+    getJSON("http://127.0.0.1:3000/api/medicef/shifts/", function (
+      error,
+      medicef
+    ) {
+      res.render("manuelDataEntry", {
+        user: req.user,
+        shift: { iab: iab, medicef: medicef },
+      });
+    });
+  });
 });
 app.get("/login", checkNotAuthenticated, function (req, res) {
-  /* User.find({
-    email: "w@w"
-}).exec(function(err, users) {
-    if (err) throw err;
-     
-    console.log("email="+users[0].toObject().password);
-});*/
-
   res.render("login", { user: "SNOUSSI", title: "homepage" });
 });
-app.get("/register", checkAuthenticated, function (req, res) {
+app.get("/register", isAdmin, function (req, res) {
   res.render("register");
 });
 
@@ -160,7 +251,7 @@ function checkAuthenticated(req, res, next) {
 }
 
 function isAdmin(req, res, next) {
-  if (req.isAuthenticated() && req.user.access.type === "admin") {
+  if (req.isAuthenticated() && req.user.access.type === "ADMIN") {
     return next();
   }
 
