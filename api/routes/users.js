@@ -1,119 +1,62 @@
 const express = require("express");
 const router = express.Router();
-const users = require("./../../config/database.js");
+const connection = require("./../../config/dbConfig");
 
 // Getting all
 router.get("/", async (req, res) => {
-  /*try {
-    users.insertMany([
-      {
-        access: { site: "all", type: "MANAGER" },
-        name: "Chaima fourati",
-        email: "Chaima23@hikma.com",
-        password:
-          "$2b$10$rQJcy5d7Jq/76.CIU6qJc.onGjH236NhwVycFG7NB.uGFu6MWbzzq",
-        department: "production",
-        phone: 55721212,
-      },
-      {
-        access: { site: "all", type: "READONLY" },
-        name: "khaled yessine",
-        email: "khaled32@hikma.com",
-        password:
-          "$2b$10$rQJcy5d7Jq/76.CIU6qJc.onGjH236NhwVycFG7NB.uGFu6MWbzzq",
-        department: "production",
-        phone: 55721212,
-      },
-      {
-        access: { site: "all", type: "READONLY" },
-        name: "samir Snoussii",
-        email: "samir23@hikma.com",
-        password:
-          "$2b$10$rQJcy5d7Jq/76.CIU6qJc.onGjH236NhwVycFG7NB.uGFu6MWbzzq",
-        department: "production",
-        phone: 55721212,
-      },
-      {
-        access: { site: "all", type: "READONLY" },
-        name: "haifa dima",
-        email: "haifa32@hikma.com",
-        password:
-          "$2b$10$rQJcy5d7Jq/76.CIU6qJc.onGjH236NhwVycFG7NB.uGFu6MWbzzq",
-        department: "production",
-        phone: 55721212,
-      },
-    ]);
-  } catch (e) {
-    print(e);
-  }*/
-  var userss;
   try {
-    userss = await users.find();
-    res.json(userss);
+    connection.query(
+      "select u.id,u.name,u.email,u.access,u.position,u.phone,u.state,u.site_id,u.department as 'dep_id' ,d.name as department,s.name as site\
+      from user u\
+      inner join department d on d.id = u.department\
+      inner join site s on s.id = u.site_id;",
+      function (error, rows) {
+        res.json(rows);
+      }
+    );
   } catch (err) {
     res.status(500).json({ message: err.message });
-  }
-});
-
-// Getting One
-router.get("/:id", getUsers, (req, res) => {
-  res.json(res.users);
-});
-
-// Creating one
-router.post("/", async (req, res) => {
-  const user = new users({
-    name: req.body.name,
-  });
-  try {
-    const newusers = await user.save();
-    res.redirect("/");
-  } catch (err) {
-    res.status(400).json({ message: err.message });
   }
 });
 
 // Updating One
-router.patch("/:id", getUsers, async (req, res) => {
-  if (req.body.name != null) {
-    res.users.name = req.body.name;
-    res.users.email = req.body.email;
-    res.users.department = req.body.department;
-    res.users.phone = req.body.phone;
-    res.users.access.site = req.body.access.site;
-    res.users.access.type = req.body.access.type;
-  }
+router.patch("/:id", async (req, res) => {
   try {
-    const updatedusers = await res.users.save();
-    res.json(updatedusers);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-});
-
-// Deleting One
-router.delete("/:id", getUsers, async (req, res) => {
-  try {
-    await res.users.remove();
-    res.json({ message: "Deleted users" });
+    var name = req.body.name;
+    var email = req.body.email;
+    var department = req.body.department;
+    var phone = req.body.phone;
+    var site = req.body.access.site;
+    var access = req.body.access.type;
+    var phone = req.body.phone;
+    var sql =
+      " UPDATE `user` SET `name` =? ,\
+    `email` = ?,`phone`=?, `department` = ?, `site_id` = ?,\
+     `access` = ? WHERE (`id` = ?);";
+    connection.query(
+      sql,
+      [name, email, phone, department, site, access, req.params.id],
+      function (error, rows) {
+        if (error) return res.status(500).json({ message: error });
+        res.json({ message: "updated user" });
+      }
+    );
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-async function getUsers(req, res, next) {
-  let user;
+// Deleting One
+router.delete("/:id", async (req, res) => {
   try {
-    user = await users.findById(req.params.id);
-    if (user == null) {
-      return res.status(404).json({ message: "Cannot find users" });
-    }
+    var sql = "DELETE FROM `user` WHERE (`id` = ?)";
+    connection.query(sql, req.params.id, function (error, rows) {
+      if (error) return res.status(500).json({ message: error });
+      res.json({ message: "deleted user" });
+    });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
-
-  res.users = user;
-  next();
-}
+});
 
 module.exports = router;

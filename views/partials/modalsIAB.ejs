@@ -30,11 +30,11 @@
           <div class="form-group">
             <label>type</label>
             <select class="custom-select" id="type" required>
-              <option value="packaging">Packaging</option>
-              <option value="utility">Utility</option>
-              <option value="processing">Processing</option>
-              <option value="ouality">Quality</option>
-              <option value="other">Other</option>
+              <option value="2">Packaging</option>
+              <option value="3">Utility</option>
+              <option value="1">Processing</option>
+              <option value="4">Quality</option>
+              <option value="5">Other</option>
             </select>
           </div>
         </div>
@@ -83,11 +83,11 @@
           <div class="form-group">
             <label>type</label>
             <select class="custom-select" id="type" required>
-              <option value="packaging">Packaging</option>
-              <option value="utility">Utility</option>
-              <option value="processing">Processing</option>
-              <option value="ouality">Quality</option>
-              <option value="other">Other</option>
+              <option value="2">Packaging</option>
+              <option value="3">Utility</option>
+              <option value="1">Processing</option>
+              <option value="4">Quality</option>
+              <option value="5">Other</option>
             </select>
           </div>
         </div>
@@ -117,7 +117,7 @@
     var type = $("#editEquipmentModal #type").children("option:selected").val();
 
     $.ajax({
-      url: "http://127.0.0.1:3000/api/iab/equipments/" + id,
+      url: "http://127.0.0.1:3000/api/equipments/" + id,
       method: "patch",
       data: {
         name: name,
@@ -135,13 +135,14 @@
   }
   function addEquipment() {
     var name = $("#addEquipmentModal #name").val();
-    var type = $("#editEquipmentModal #type").children("option:selected").val();
+    var type = $("#addEquipmentModal #type").children("option:selected").val();
     $.ajax({
-      url: "http://127.0.0.1:3000/api/iab/equipments/",
+      url: "http://127.0.0.1:3000/api/equipments/",
       method: "post",
       data: {
         name: name,
         type: type,
+        site: "1",
       },
       success: function (response) {
         $("#table").bootstrapTable("refresh");
@@ -183,7 +184,12 @@
           </div>
           <div class="form-group">
             <label>Department</label>
-            <input type="text" id="department" class="form-control" required />
+            <select class="custom-select" id="department" required>
+              <option value="1">Production</option>
+              <option value="2">Quality</option>
+              <option value="3">Engineering</option>
+              <option value="4">Other</option>
+            </select>
           </div>
           <div class="form-group">
             <label>Phone</label>
@@ -197,9 +203,9 @@
           <div class="form-group">
             <label>Site</label>
             <select class="custom-select" id="site" required>
-              <option value="IAB">IAB</option>
-              <option value="MEDICEF">MEDICEF</option>
-              <option value="ALL">IAB & MEDICEF</option>
+              <option value="1">IAB</option>
+              <option value="2">MEDICEF</option>
+              <option value="3">IAB & MEDICEF</option>
             </select>
           </div>
           <div class="form-group">
@@ -238,7 +244,9 @@
     var id = $("#editUserModal #id").val();
     var site = $("#editUserModal #site").children("option:selected").val();
     var type = $("#editUserModal #type").children("option:selected").val();
-    var department = $("#editUserModal #department").val();
+    var department = $("#editUserModal #department")
+      .children("option:selected")
+      .val();
     var phone = $("#editUserModal #phone").val();
     var email = $("#editUserModal #email").val();
     $.ajax({
@@ -361,7 +369,7 @@
     var name = $("#editProductModal #name").val();
     var id = $("#editProductModal #id").val();
     $.ajax({
-      url: "http://127.0.0.1:3000/api/iab/products/" + id,
+      url: "http://127.0.0.1:3000/api/products/" + id,
       method: "patch",
       data: {
         name: name,
@@ -386,10 +394,11 @@
     var name = $("#addProductModal #name").val();
 
     $.ajax({
-      url: "http://127.0.0.1:3000/api/iab/products/",
+      url: "http://127.0.0.1:3000/api/products/",
       method: "post",
       data: {
         name: name,
+        site: 1,
       },
 
       success: function (response) {

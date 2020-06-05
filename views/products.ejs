@@ -82,7 +82,7 @@
         <!-- Main content -->
         <section class="content">
           <div class="row">
-            <% if (user.access.site=="ALL" || user.access.site=='IAB') { %>
+            <% if (user.site_id==1 || user.site_id==3) { %>
             <div class="col-12">
               <!-- /.card -->
 
@@ -125,7 +125,7 @@
                     data-id-field="id"
                     data-page-list="[5, 10, 25, all]"
                     data-show-footer="true"
-                    data-url="http://127.0.0.1:3000/api/iab/products"
+                    data-url="http://127.0.0.1:3000/api/products/1"
                     data-response-handler="responseHandler"
                   ></table>
                 </div>
@@ -135,7 +135,7 @@
             </div>
             <% } %>
             <!-- /.col -->
-            <% if (user.access.site=='ALL' || user.access.site=='MEDICEF') { %>
+            <% if (user.site_id==2 || user.site_id==3) { %>
             <div class="col-12">
               <!-- /.card -->
 
@@ -181,7 +181,7 @@
                     data-id-field="id"
                     data-page-list="[5, 10, 25, all]"
                     data-show-footer="true"
-                    data-url="http://127.0.0.1:3000/api/medicef/products"
+                    data-url="http://127.0.0.1:3000/api/products/2"
                     data-response-handler="responseHandler"
                   ></table>
                 </div>
@@ -241,7 +241,7 @@
 
       function responseHandler(res) {
         $.each(res.rows, function (i, row) {
-          row.state = $.inArray(row._id, selections) !== -1;
+          row.state = $.inArray(row.id, selections) !== -1;
         });
         return res;
       }
@@ -269,7 +269,7 @@
       window.operateEvents = {
         "click .btn-info": function (e, value, row, index) {
           $("#editProductModal #name").val(row.name);
-          $("#editProductModal #id").val(row._id);
+          $("#editProductModal #id").val(row.id);
 
           $("#editProductModal").modal("toggle");
         },
@@ -295,7 +295,7 @@
             .then((result) => {
               if (result.value) {
                 $.ajax({
-                  url: "http://127.0.0.1:3000/api/iab/products/" + row._id,
+                  url: "http://127.0.0.1:3000/api/products/" + row.id,
                   method: "delete",
                   success: function (response) {
                     $("#table").bootstrapTable("refresh");
@@ -320,13 +320,13 @@
         },
       };
       window.operateEventsMedicef = {
-        "click .edit": function (e, value, row, index) {
+        "click .btn-info": function (e, value, row, index) {
           $("#editProductMedicefModal #name").val(row.name);
-          $("#editProductMedicefModal #id").val(row._id);
+          $("#editProductMedicefModal #id").val(row.id);
 
           $("#editProductMedicefModal").modal("toggle");
         },
-        "click .remove": function (e, value, row, index) {
+        "click .btn-danger": function (e, value, row, index) {
           const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
               confirmButton: "btn btn-success",
@@ -348,7 +348,7 @@
             .then((result) => {
               if (result.value) {
                 $.ajax({
-                  url: "http://127.0.0.1:3000/api/medicef/products/" + row._id,
+                  url: "http://127.0.0.1:3000/api/products/" + row.id,
                   method: "delete",
                   success: function (response) {
                     $("#medicef").bootstrapTable("refresh");
@@ -397,7 +397,7 @@
           columns: [
             {
               title: "Item ID",
-              field: "_id",
+              field: "id",
               align: "center",
               valign: "middle",
               visible: false,
@@ -446,7 +446,7 @@
           columns: [
             {
               title: "Item ID",
-              field: "_id",
+              field: "id",
               align: "center",
               valign: "middle",
               visible: false,

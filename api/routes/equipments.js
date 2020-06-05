@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Equipments = require("../models/IABequipment");
+const connection = require("./../../config/dbConfig");
 
 var doc = [
   { name: "Blister machine Marcheseni MB421 (Line1)", type: "packaging" },
@@ -50,73 +50,71 @@ var doc = [
 ];
 
 // Getting all
-router.get("/", async (req, res) => {
-  var Equipmentss;
+router.get("/:site", async (req, res) => {
   try {
-    //Equipments.insertMany(doc);
-    Equipmentss = await Equipments.find();
-    res.json(Equipmentss);
+    if (req.params.site == "chart")
+      sql =
+        "SELECT Category ,count(*) as Number FROM hikma.equipment where Category is not null group by Category ";
+    else
+      sql =
+        "select e.id,e.name,e.parc as parcId,Line,Category,p.name as parc from equipment e\
+    inner join parc p on p.id = e.parc\
+    where e.site_id=" +
+        req.params.site +
+        "; ";
+    connection.query(sql, function (error, rows) {
+      res.json(rows);
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-// Getting One
-router.get("/:id", getEquipments, (req, res) => {
-  res.json(res.Equipments);
-});
-
 // Creating one
 router.post("/", async (req, res) => {
-  const Equipment = new Equipments({
-    name: req.body.name,
-    type: req.body.type,
-  });
+  var name = req.body.name;
+  var type = req.body.type;
+  var site = req.body.site;
   try {
-    const newEquipments = await Equipment.save();
-    res.redirect("/");
+    var sql =
+      "INSERT INTO `hikma`.`equipment` (`name`, `parc`, `site_id`) VALUES (?,?,?);";
+    connection.query(sql, [name, type, site], function (error, rows) {
+      if (error) return res.status(500).json({ message: error });
+      res.json({ message: "added equipment" });
+    });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 });
 
 // Updating One
-router.patch("/:id", getEquipments, async (req, res) => {
-  if (req.body.name != null) {
-    res.Equipments.name = req.body.name;
-    res.Equipments.type = req.body.type;
-  }
+router.patch("/:id", async (req, res) => {
   try {
-    const updatedEquipments = await res.Equipments.save();
-    res.json(updatedEquipments);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-});
-
-// Deleting One
-router.delete("/:id", getEquipments, async (req, res) => {
-  try {
-    await res.Equipments.remove();
-    res.json({ message: "Deleted Equipments" });
+    var name = req.body.name;
+    var type = req.body.type;
+    var sql =
+      " UPDATE `equipment` SET `name` =? ,\
+    `parc` = ? WHERE (`id` = ?);";
+    connection.query(sql, [name, type, req.params.id], function (error, rows) {
+      if (error) return res.status(500).json({ message: error });
+      res.json({ message: "updated equipment" });
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-async function getEquipments(req, res, next) {
-  let Equipment;
+// Deleting One
+router.delete("/:id", async (req, res) => {
   try {
-    Equipment = await Equipments.findById(req.params.id);
-    if (Equipment == null) {
-      return res.status(404).json({ message: "Cannot find Equipments" });
-    }
+    var sql = "DELETE FROM `equipment` WHERE (`id` = ?)";
+    connection.query(sql, req.params.id, function (error, rows) {
+      if (error) return res.status(500).json({ message: error });
+      res.json({ message: "deleted equipment" });
+    });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
-
-  res.Equipments = Equipment;
-  next();
-}
+});
 
 module.exports = router;

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const products = require("../models/IABproduct");
+const connection = require("./../../config/dbConfig");
 function formatDate() {
   var today = new Date();
   var dd = String(today.getDate()).padStart(2, "0");
@@ -690,71 +690,61 @@ var doc = [
   },
 ];
 // Getting all
-router.get("/", async (req, res) => {
-  var productss;
+router.get("/:site", async (req, res) => {
   try {
-    // products.insertMany(doc);
-    productss = await products.find();
-    res.json(productss);
+    connection.query(
+      "SELECT * FROM product where site='" + req.params.site + "'",
+      function (error, rows) {
+        res.json(rows);
+      }
+    );
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-// Getting One
-router.get("/:id", getproducts, (req, res) => {
-  res.json(res.products);
-});
-
 // Creating one
 router.post("/", async (req, res) => {
-  const user = new products({
-    name: req.body.name,
-  });
+  var name = req.body.name;
+  var Category = 1;
+  var site = req.body.site;
   try {
-    const newproducts = await user.save();
-    res.redirect("/");
+    var sql =
+      "INSERT INTO `product` (`name`, `Category`, `site`) VALUES (?,?,?);";
+    connection.query(sql, [name, Category, site], function (error, rows) {
+      if (error) return res.status(500).json({ message: error });
+      res.json({ message: "added equipment" });
+    });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 });
 
 // Updating One
-router.patch("/:id", getproducts, async (req, res) => {
-  if (req.body.name != null) {
-    res.products.name = req.body.name;
-  }
+router.patch("/:id", async (req, res) => {
   try {
-    const updatedproducts = await res.products.save();
-    res.json(updatedproducts);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-});
-
-// Deleting One
-router.delete("/:id", getproducts, async (req, res) => {
-  try {
-    await res.products.remove();
-    res.json({ message: "Deleted products" });
+    var name = req.body.name;
+    var sql = " UPDATE `product` SET `name` =?  WHERE (`id` = ?);";
+    connection.query(sql, [name, req.params.id], function (error, rows) {
+      if (error) return res.status(500).json({ message: error });
+      res.json({ message: "updated product" });
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-async function getproducts(req, res, next) {
-  let product;
+// Deleting One
+router.delete("/:id", async (req, res) => {
   try {
-    product = await products.findById(req.params.id);
-    if (product == null) {
-      return res.status(404).json({ message: "Cannot find products" });
-    }
+    var sql = "DELETE FROM `product` WHERE (`id` = ?)";
+    connection.query(sql, req.params.id, function (error, rows) {
+      if (error) return res.status(500).json({ message: error });
+      res.json({ message: "deleted product" });
+    });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
-
-  res.products = product;
-  next();
-}
+});
 
 module.exports = router;

@@ -75,7 +75,36 @@
         <div class="card-body register-card-body">
           <p class="login-box-msg">Register a new membership</p>
 
-          <% if ( messages.exist ) { %> <%= messages.exist %> <% } %>
+          <% if (messages.error == "Account created") { %>
+
+          <div class="alert alert-success alert-dismissible">
+            <button
+              type="button"
+              class="close"
+              data-dismiss="alert"
+              aria-hidden="true"
+            >
+              ×
+            </button>
+            <h7><i class="icon fas fa-check-circle"></i> Congratulations!</h7>
+            <%= messages.error %>
+          </div>
+
+          <% } if (messages.error!="Account created" && messages.error){%>
+          <div class="alert alert-danger alert-dismissible">
+            <button
+              type="button"
+              class="close"
+              data-dismiss="alert"
+              aria-hidden="true"
+            >
+              ×
+            </button>
+            <h7><i class="icon fas fa-ban"></i> Try again!</h7>
+            <%= messages.error %>
+          </div>
+
+          <% } %>
           <form action="/register" method="POST" name="registration">
             <div class="input-group mb-3">
               <input
@@ -94,9 +123,27 @@
               <input
                 type="text"
                 class="form-control"
-                placeholder="Department"
-                name="department"
+                placeholder="Position"
+                name="position"
               />
+              <div class="input-group-append">
+                <div class="input-group-text">
+                  <span class="fas fa-user"></span>
+                </div>
+              </div>
+            </div>
+            <div class="input-group mb-3">
+              <select
+                class="custom-select"
+                id="department"
+                name="department"
+                required
+              >
+                <option value="1">Production</option>
+                <option value="2">Quality</option>
+                <option value="3">Engineering</option>
+                <option value="4">Other</option>
+              </select>
               <div class="input-group-append">
                 <div class="input-group-text">
                   <span class="fas fa-vials"></span>
@@ -131,8 +178,9 @@
             </div>
             <div class="input-group mb-3">
               <select class="custom-select" name="site">
-                <option>IAB</option>
-                <option>MEDICEF</option>
+                <option value="1">IAB</option>
+                <option value="2">MEDICEF</option>
+                <option value="3">IAB & MEDICEF</option>
               </select>
               <div class="input-group-append">
                 <div class="input-group-text">

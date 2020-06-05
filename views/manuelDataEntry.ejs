@@ -29,6 +29,11 @@
       rel="stylesheet"
       href="/assets/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css"
     />
+    <!-- Tempusdominus Bbootstrap 4 -->
+    <link
+      rel="stylesheet"
+      href="/assets/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css"
+    />
     <!-- Theme style -->
     <link rel="stylesheet" href="assets/dist/css/adminlte.min.css" />
     <!-- Google Font: Source Sans Pro -->
@@ -82,8 +87,38 @@
         <section class="content">
           <div class="row">
             <div class="col-12">
+              <!--! Error msgs-->
+              <% if(messages.info){%>
+              <div class="alert alert-success alert-dismissible">
+                <button
+                  type="button"
+                  class="close"
+                  data-dismiss="alert"
+                  aria-hidden="true"
+                >
+                  ×
+                </button>
+                <h6><i class="icon fas fa-check"></i> Alert!</h6>
+                <%= messages.info %>
+              </div>
+
+              <%}%> <% if(messages.error){%>
+              <div class="alert alert-warning alert-dismissible">
+                <button
+                  type="button"
+                  class="close"
+                  data-dismiss="alert"
+                  aria-hidden="true"
+                >
+                  ×
+                </button>
+                <h6><i class="icon fas fa-exclamation-triangle"></i> Alert!</h6>
+                A problem has accured please try again later !
+              </div>
+
+              <%}%>
               <!-- /.card -->
-              <% if (user.access.site=="ALL" || user.access.site=='IAB') { %>
+              <% if (user.site_id==1 || user.site_id==3) { %>
 
               <div class="card card-outline card-danger" id="iab">
                 <div class="card-header" id="headingOne">
@@ -102,13 +137,34 @@
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body">
-                  <form role="form">
+                  <form
+                    role="form"
+                    action="/api/ManuelDataEntry/"
+                    method="POST"
+                    name="manuelDataEntry"
+                  >
                     <div class="card-body">
+                      <input
+                        type="text"
+                        class="form-control"
+                        name="site"
+                        value="1"
+                        hidden
+                      />
+                      <input
+                        type="text"
+                        class="form-control"
+                        name="operatorID"
+                        value="<%= user.id %>"
+                        hidden
+                      />
+
                       <div class="form-group">
                         <label for="datePicker">Date</label>
                         <input
                           type="date"
                           id="datePicker"
+                          name="date"
                           class="form-control"
                         />
                       </div>
@@ -134,163 +190,429 @@
                         >
                         </select>
                       </div>
-                      <div class="form-group">
-                        <label for="shift">Shift</label>
-                        <select
-                          class="form-control select2 select2-danger"
-                          data-dropdown-css-class="select2-danger"
-                          style="width: 100%;"
-                          id="shift"
-                        >
-                          <option value="1">
-                            Shift A (start: <%= shift.iab.first.start %> end:
-                            <%= shift.iab.first.end %> )
-                          </option>
-                          <% if(shift.iab.number >= '2') {%>
-                          <option value="2">
-                            Shift B (start: <%= shift.iab.second.start %> end:
-                            <%= shift.iab.second.end %> )
-                          </option>
-                          <% } %> <% if(shift.iab.number == '3'){%>
-                          <option value="3">
-                            Shift C (start: <%= shift.iab.third.start %> end:
-                            <%= shift.iab.third.end %> )
-                          </option>
-
-                          <% } %>
-                        </select>
-                      </div>
-                      <!--<div class="form-group clearfix">
-                        <div class="row">
-                          <div class="col-2 align-self-center">
-                            <label for="time">Waiting for Materials</label>
-                          </div>
-                          <div class="col-1">
+                      <div class="form-group row">
+                        <div class="form-group col-sm-6">
+                          <label for="shiftStart">Shift start</label>
+                          <div
+                            class="input-group date"
+                            id="shiftStart"
+                            data-target-input="nearest"
+                          >
                             <input
-                              class="form-control"
                               type="text"
-                              name="time"
-                              id="timee"
+                              class="form-control datetimepicker-input"
+                              data-target="#shiftStart"
+                              name="shiftStart"
+                              value="7:30 AM"
                             />
-                          </div>
-                        </div>
-                      </div>-->
-                      <div class="form-group clearfix">
-                        <div class="icheck-danger d-inline">
-                          <input
-                            type="checkbox"
-                            id="checkboxDanger1"
-                            data-toggle="collapse"
-                            data-target="#demo"
-                          />
-                          <label for="checkboxDanger1">
-                            Waiting for Materials
-                          </label>
-                          <div class="collapse" id="demo">
-                            <div class="row">
-                              <div class="col-1 align-self-center">
-                                Duration
-                              </div>
-                              <div class="col-1">
-                                <input
-                                  class="form-control"
-                                  type="text"
-                                  name="time"
-                                  id="time"
-                                />
+                            <div
+                              class="input-group-append"
+                              data-target="#shiftStart"
+                              data-toggle="datetimepicker"
+                            >
+                              <div class="input-group-text">
+                                <i class="far fa-clock"></i>
                               </div>
                             </div>
                           </div>
                         </div>
-
-                        <br />
-
-                        <div class="icheck-danger d-inline">
-                          <input type="checkbox" id="checkboxDanger2" />
-                          <label for="checkboxDanger2">
-                            Waiting for operators</label
+                        <div class="form-group col-sm-6">
+                          <label for="shiftEnd">Shift end </label>
+                          <div
+                            class="input-group date"
+                            id="shiftEnd"
+                            data-target-input="nearest"
                           >
-                        </div>
-                        <br />
-                        <div class="icheck-danger d-inline">
-                          <input type="checkbox" id="checkboxDanger3" />
-                          <label for="checkboxDanger3">
-                            Waiting for Quality
-                          </label>
-                        </div>
-                        <br />
-                        <div class="icheck-danger d-inline">
-                          <input type="checkbox" id="checkboxDanger4" />
-                          <label for="checkboxDanger4">
-                            Waiting for QVM
-                          </label>
-                        </div>
-                        <br />
-                        <div class="icheck-danger d-inline">
-                          <input type="checkbox" id="checkboxDanger5" />
-                          <label for="checkboxDanger5">
-                            Waiting for Maint.
-                          </label>
+                            <input
+                              type="text"
+                              class="form-control datetimepicker-input"
+                              data-target="#shiftEnd"
+                              name="shiftEnd"
+                              value="12:00 AM"
+                            />
+                            <div
+                              class="input-group-append"
+                              data-target="#shiftEnd"
+                              data-toggle="datetimepicker"
+                            >
+                              <div class="input-group-text">
+                                <i class="far fa-clock"></i>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                      <div class="form-group clearfix">
-                        <div class="icheck-danger d-inline">
+
+                      <div class="callout callout-danger">
+                        <h5>Planned down time</h5>
+
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Break</label>
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="break"
+                              placeholder="min"
+                            />
+                          </div>
+                          <label class="col-sm-2 col-form-label"
+                            >Preventive Maint.</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="PreventiveMaint"
+                              placeholder="min"
+                            />
+                          </div>
+                          <label class="col-sm-2 col-form-label"
+                            >Planned Down time</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="plannedDownTime"
+                              placeholder="min"
+                            />
+                          </div>
+                          <label class="col-sm-2 col-form-label">other</label>
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="otherPlannedDownTime"
+                              placeholder="min"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="callout callout-danger">
+                        <h5>Unlpanned down time</h5>
+
+                        <div class="form-group row">
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >Cleaning and end of run</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="CleaningAndEndOfRun"
+                              placeholder="min"
+                            />
+                          </div>
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >Waiting for QVM</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="wQVM"
+                              placeholder="min"
+                            />
+                          </div>
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >Quality Validation</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="QualityValidation"
+                              placeholder="min"
+                            />
+                          </div>
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >Waiting for Maint</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="wMaint"
+                              placeholder="min"
+                            />
+                          </div>
+                        </div>
+                        <div class="form-group row">
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >Startup</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="startup"
+                              placeholder="min"
+                            />
+                          </div>
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >QVM Intervention</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="QVMIntervention"
+                              placeholder="min"
+                            />
+                          </div>
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >Adjustments</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="adjustments"
+                              placeholder="min"
+                            />
+                          </div>
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >Maint. Intervention</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="maintIntervention"
+                              placeholder="min"
+                            />
+                          </div>
+                        </div>
+                        <div class="form-group row">
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >Waiting for Materials</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="wMaterials"
+                              placeholder="min"
+                            />
+                          </div>
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >Lack of Electricity</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="lackOfElectricity"
+                              placeholder="min"
+                            />
+                          </div>
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >Waiting for Operators</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="wOperators"
+                              placeholder="min"
+                            />
+                          </div>
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >Lack of air</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="lackOfAir"
+                              placeholder="min"
+                            />
+                          </div>
+                        </div>
+                        <div class="form-group row">
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >Waiting for Quality</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="wQuality"
+                              placeholder="min"
+                            />
+                          </div>
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >Lack of Water</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="lackOFWater"
+                              placeholder="min"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <div class="form-group col-sm-6">
+                          <label for="numberOfBreakdowns"
+                            >Number of breakdowns
+                          </label>
                           <input
-                            type="checkbox"
-                            checked=""
-                            id="lackOfElectricity"
+                            type="text"
+                            class="form-control"
+                            id="numberOfBreakdowns"
+                            name="numberOfBreakdowns"
+                            placeholder="Enter Number of breakdowns
+                          "
                           />
-                          <label for="lackOfElectricity">
-                            Lack of Electricity</label
-                          >
                         </div>
-                        <br />
-
-                        <div class="icheck-danger d-inline">
-                          <input type="checkbox" id="lackOfAir" />
-                          <label for="lackOfAir"> Lack of comp.air</label>
-                        </div>
-                        <br />
-                        <div class="icheck-danger d-inline">
-                          <input type="checkbox" id="lackOfWater" />
-                          <label for="lackOfWater">
-                            Lack of water
-                          </label>
+                        <div class="form-group col-sm-6">
+                          <label for="plannedQty">Planned Qty </label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="plannedQty"
+                            name="plannedQty"
+                            placeholder="Enter planned Qty"
+                          />
                         </div>
                       </div>
+                      <div class="form-group row">
+                        <div class="form-group col-sm-6">
+                          <label
+                            for="producedQty
+                      "
+                            >Produced Qty
+                          </label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="producedQty"
+                            name="producedQty"
+                            placeholder="Enter produced Qty"
+                          />
+                        </div>
+                        <div class="form-group col-sm-6">
+                          <label
+                            for="validatedSpeed
+                      "
+                            >Validated speed
+                          </label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="validatedSpeed"
+                            name="validatedSpeed"
+                            placeholder="Enter Validated speed "
+                          />
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <div class="form-group col-sm-6">
+                          <label
+                            for="maximalSpeed
+                      "
+                            >Maximal speed
+                          </label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="maximalSpeed"
+                            name="maximalSpeed"
+                            placeholder="Enter Maximal Speed"
+                          />
+                        </div>
+                        <div class="form-group col-sm-6">
+                          <label
+                            for="appliedSpeed
+                      "
+                            >Applied speed
+                          </label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="appliedSpeed"
+                            name="appliedSpeed"
+                            placeholder="Enter Applied speed"
+                          />
+                        </div>
+                      </div>
+
                       <div class="form-group">
-                        <label for="numberOfBreakdowns"
-                          >Number of breakdowns
+                        <label
+                          for="scarp
+                      "
+                          >Scarp
                         </label>
                         <input
                           type="text"
                           class="form-control"
-                          id="numberOfBreakdowns"
-                          placeholder="Enter Number of breakdowns
-                          "
-                        />
-                      </div>
-                      <div class="form-group">
-                        <label for="plannedQty">Planned Qty </label>
-                        <input
-                          type="text"
-                          class="form-control"
-                          id="plannedQty"
-                          placeholder="Enter planned Qty"
+                          id="scarp"
+                          name="scarp"
+                          placeholder="Enter Scarp"
                         />
                       </div>
                       <div class="form-group">
                         <label
-                          for="producedQty
+                          for="comment
                       "
-                          >Produced Qty
+                          >Comment
                         </label>
-                        <input
-                          type="text"
+                        <textarea
                           class="form-control"
-                          id="producedQty"
-                          placeholder="Enter produced Qty"
-                        />
+                          id="comment"
+                          rows="2"
+                          placeholder="Enter your comment"
+                        ></textarea>
                       </div>
                     </div>
                     <!-- /.card-body -->
@@ -301,8 +623,7 @@
                   </form>
                 </div>
               </div>
-              <% } %> <% if (user.access.site=='ALL' ||
-              user.access.site=='MEDICEF') { %>
+              <% } %> <% if (user.site_id==2 || user.site_id==3) { %>
 
               <!--!medicef-->
               <div class="card card-outline card-danger" id="medicef">
@@ -322,143 +643,481 @@
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body">
-                  <form role="form">
+                  <form
+                    role="form"
+                    action="/api/ManuelDataEntry/"
+                    method="POST"
+                    name="manuelDataEntryMedicef"
+                  >
                     <div class="card-body">
+                      <input
+                        type="text"
+                        class="form-control"
+                        name="site"
+                        value="2"
+                        hidden
+                      />
+                      <input
+                        type="text"
+                        class="form-control"
+                        name="operatorID"
+                        value="<%= user.id %>"
+                        hidden
+                      />
+
                       <div class="form-group">
                         <label for="datePicker">Date</label>
                         <input
                           type="date"
                           id="datePicker"
+                          name="date"
                           class="form-control"
                         />
                       </div>
                       <div class="form-group">
-                        <label for="productSelect2">Product</label>
+                        <label for="productSelectMedicef">Product</label>
                         <select
                           class="form-control select2 select2-danger"
                           data-dropdown-css-class="select2-danger"
                           style="width: 100%;"
-                          id="productSelect2"
+                          id="productSelectMedicef"
+                          name="productSelect"
                         >
                         </select>
                       </div>
                       <div class="form-group">
-                        <label for="shift">Shift</label>
+                        <label for="equipmentSelectMedicef">Equipment</label>
                         <select
                           class="form-control select2 select2-danger"
                           data-dropdown-css-class="select2-danger"
                           style="width: 100%;"
-                          id="shift"
+                          id="equipmentSelectMedicef"
+                          name="equipmentSelect"
                         >
-                          <option value="1">Shift A</option>
-                          <% if(shift.medicef.number >= '2') {%>
-                          <option value="2">Shift B</option>
-                          <% } %> <% if(shift.medicef.number == '3'){%>
-                          <option value="3">Shift C</option>
-
-                          <% } %>
                         </select>
                       </div>
-
-                      <div class="form-group clearfix">
-                        <div class="icheck-danger d-inline">
-                          <input
-                            type="checkbox"
-                            checked=""
-                            id="checkboxDanger1"
-                          />
-                          <label for="checkboxDanger1">
-                            Waiting for Materials</label
+                      <div class="form-group row">
+                        <div class="form-group col-sm-6">
+                          <label for="shiftStartMedicef">Shift start</label>
+                          <div
+                            class="input-group date"
+                            id="shiftStartMedicef"
+                            data-target-input="nearest"
                           >
+                            <input
+                              type="text"
+                              class="form-control datetimepicker-input"
+                              data-target="#shiftStartMedicef"
+                              name="shiftStart"
+                              value="7:30 AM"
+                            />
+                            <div
+                              class="input-group-append"
+                              data-target="#shiftStartMedicef"
+                              data-toggle="datetimepicker"
+                            >
+                              <div class="input-group-text">
+                                <i class="far fa-clock"></i>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <br />
-
-                        <div class="icheck-danger d-inline">
-                          <input type="checkbox" id="checkboxDanger2" />
-                          <label for="checkboxDanger2">
-                            Waiting for operators</label
+                        <div class="form-group col-sm-6">
+                          <label for="shiftEndMedicef">Shift end </label>
+                          <div
+                            class="input-group date"
+                            id="shiftEndMedicef"
+                            data-target-input="nearest"
                           >
-                        </div>
-                        <br />
-                        <div class="icheck-danger d-inline">
-                          <input type="checkbox" id="checkboxDanger3" />
-                          <label for="checkboxDanger3">
-                            Waiting for Quality
-                          </label>
-                        </div>
-                        <br />
-                        <div class="icheck-danger d-inline">
-                          <input type="checkbox" id="checkboxDanger4" />
-                          <label for="checkboxDanger4">
-                            Waiting for QVM
-                          </label>
-                        </div>
-                        <br />
-                        <div class="icheck-danger d-inline">
-                          <input type="checkbox" id="checkboxDanger5" />
-                          <label for="checkboxDanger5">
-                            Waiting for Maint.
-                          </label>
+                            <input
+                              type="text"
+                              class="form-control datetimepicker-input"
+                              data-target="#shiftEndMedicef"
+                              name="shiftEnd"
+                              value="11:30 PM"
+                            />
+                            <div
+                              class="input-group-append"
+                              data-target="#shiftEndMedicef"
+                              data-toggle="datetimepicker"
+                            >
+                              <div class="input-group-text">
+                                <i class="far fa-clock"></i>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                      <div class="form-group clearfix">
-                        <div class="icheck-danger d-inline">
-                          <input
-                            type="checkbox"
-                            checked=""
-                            id="lackOfElectricity"
-                          />
-                          <label for="lackOfElectricity">
-                            Lack of Electricity</label
-                          >
-                        </div>
-                        <br />
 
-                        <div class="icheck-danger d-inline">
-                          <input type="checkbox" id="lackOfAir" />
-                          <label for="lackOfAir"> Lack of comp.air</label>
+                      <div class="callout callout-danger">
+                        <h5>Planned down time</h5>
+
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Break</label>
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="break"
+                              placeholder="min"
+                            />
+                          </div>
+                          <label class="col-sm-2 col-form-label"
+                            >Preventive Maint.</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="PreventiveMaint"
+                              placeholder="min"
+                            />
+                          </div>
+                          <label class="col-sm-2 col-form-label"
+                            >Planned Down time</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="plannedDownTime"
+                              placeholder="min"
+                            />
+                          </div>
+                          <label class="col-sm-2 col-form-label">other</label>
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="otherPlannedDownTime"
+                              placeholder="min"
+                            />
+                          </div>
                         </div>
-                        <br />
-                        <div class="icheck-danger d-inline">
-                          <input type="checkbox" id="lackOfWater" />
-                          <label for="lackOfWater">
-                            Lack of water
+                      </div>
+                      <div class="callout callout-danger">
+                        <h5>Unlpanned down time</h5>
+
+                        <div class="form-group row">
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >Cleaning and end of run</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="CleaningAndEndOfRun"
+                              placeholder="min"
+                            />
+                          </div>
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >Waiting for QVM</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="wQVM"
+                              placeholder="min"
+                            />
+                          </div>
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >Quality Validation</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="QualityValidation"
+                              placeholder="min"
+                            />
+                          </div>
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >Waiting for Maint</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="wMaint"
+                              placeholder="min"
+                            />
+                          </div>
+                        </div>
+                        <div class="form-group row">
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >Startup</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="startup"
+                              placeholder="min"
+                            />
+                          </div>
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >QVM Intervention</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="QVMIntervention"
+                              placeholder="min"
+                            />
+                          </div>
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >Adjustments</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="adjustments"
+                              placeholder="min"
+                            />
+                          </div>
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >Maint. Intervention</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="maintIntervention"
+                              placeholder="min"
+                            />
+                          </div>
+                        </div>
+                        <div class="form-group row">
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >Waiting for Materials</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="wMaterials"
+                              placeholder="min"
+                            />
+                          </div>
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >Lack of Electricity</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="lackOfElectricity"
+                              placeholder="min"
+                            />
+                          </div>
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >Waiting for Operators</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="wOperators"
+                              placeholder="min"
+                            />
+                          </div>
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >Lack of air</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="lackOfAir"
+                              placeholder="min"
+                            />
+                          </div>
+                        </div>
+                        <div class="form-group row">
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >Waiting for Quality</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="wQuality"
+                              placeholder="min"
+                            />
+                          </div>
+                          <label
+                            for="staticEmail"
+                            class="col-sm-2 col-form-label"
+                            >Lack of Water</label
+                          >
+                          <div class="col-sm-1">
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control"
+                              name="lackOFWater"
+                              placeholder="min"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <div class="form-group col-sm-6">
+                          <label for="numberOfBreakdowns"
+                            >Number of breakdowns
                           </label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="numberOfBreakdowns"
+                            name="numberOfBreakdowns"
+                            placeholder="Enter Number of breakdowns
+                          "
+                          />
+                        </div>
+                        <div class="form-group col-sm-6">
+                          <label for="plannedQty">Planned Qty </label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="plannedQty"
+                            name="plannedQty"
+                            placeholder="Enter planned Qty"
+                          />
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <div class="form-group col-sm-6">
+                          <label
+                            for="producedQty
+                      "
+                            >Produced Qty
+                          </label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="producedQty"
+                            name="producedQty"
+                            placeholder="Enter produced Qty"
+                          />
+                        </div>
+                        <div class="form-group col-sm-6">
+                          <label
+                            for="validatedSpeed
+                      "
+                            >Validated speed
+                          </label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="validatedSpeed"
+                            name="validatedSpeed"
+                            placeholder="Enter Validated speed "
+                          />
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <div class="form-group col-sm-6">
+                          <label
+                            for="maximalSpeed
+                      "
+                            >Maximal speed
+                          </label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="maximalSpeed"
+                            name="maximalSpeed"
+                            placeholder="Enter Maximal Speed"
+                          />
+                        </div>
+                        <div class="form-group col-sm-6">
+                          <label
+                            for="appliedSpeed
+                      "
+                            >Applied speed
+                          </label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="appliedSpeed"
+                            name="appliedSpeed"
+                            placeholder="Enter Applied speed"
+                          />
                         </div>
                       </div>
                       <div class="form-group">
-                        <label for="numberOfBreakdowns"
-                          >Number of breakdowns
+                        <label
+                          for="scarp
+                      "
+                          >Scarp
                         </label>
                         <input
                           type="text"
                           class="form-control"
-                          id="numberOfBreakdowns"
-                          placeholder="Enter Number of breakdowns
-                          "
-                        />
-                      </div>
-                      <div class="form-group">
-                        <label for="plannedQty">Planned Qty </label>
-                        <input
-                          type="text"
-                          class="form-control"
-                          id="plannedQty"
-                          placeholder="Enter planned Qty"
+                          id="scarp"
+                          name="scarp"
+                          placeholder="Enter Scarp"
                         />
                       </div>
                       <div class="form-group">
                         <label
-                          for="producedQty
+                          for="comment
                       "
-                          >Produced Qty
+                          >Comment
                         </label>
-                        <input
-                          type="text"
+                        <textarea
                           class="form-control"
-                          id="producedQty"
-                          placeholder="Enter produced Qty"
-                        />
+                          id="comment"
+                          rows="2"
+                          placeholder="Enter your comment"
+                        ></textarea>
                       </div>
                     </div>
                     <!-- /.card-body -->
@@ -499,7 +1158,10 @@
     <!-- sweetalert2  -->
     <script src="/assets/plugins/sweetalert2/sweetalert2.js"></script>
 
-    <script src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js"></script>
+    <!-- InputMask -->
+    <script src="assets/plugins/moment/moment.min.js"></script>
+    <!-- Tempusdominus Bootstrap 4 -->
+    <script src="assets\plugins\tempusdominus-bootstrap-4\js\tempusdominus-bootstrap-4.min.js"></script>
 
     <!-- hikma dashboard  -->
     <script src="/assets/dist/js/pages/dashboard.js"></script>
@@ -518,31 +1180,26 @@
       $("#navtree").removeClass("menu-open");
       var d;
       $(function () {
-        var checkboxes = document.getElementsByTagName("input");
-
-        for (var i = 0; i < checkboxes.length; i++) {
-          if (checkboxes[i].type == "checkbox") {
-            checkboxes[i].checked = false;
-          }
-        }
-        $("#time")
-          .inputmask("datetime", {
-            mask: "h:s",
-            placeholder: "hh:mm",
-          })
-          .val("00:00");
-
+        $("#shiftStart").datetimepicker({
+          format: "LT",
+        });
+        $("#shiftEnd").datetimepicker({
+          format: "LT",
+        });
+        $("#shiftStartMedicef").datetimepicker({
+          format: "LT",
+        });
+        $("#shiftEndMedicef").datetimepicker({
+          format: "LT",
+        });
         var data = $.ajax({
-          url: "http://127.0.0.1:3000/api/iab/products/",
+          url: "http://127.0.0.1:3000/api/products/1",
           dataType: "json",
           type: "GET",
           success: function (data) {
             var re = $.map(data, function (obj) {
-              obj.id = obj._id;
+              obj.id = obj.id;
               obj.text = obj.name;
-              delete obj._id;
-              delete obj.name;
-              delete obj.__v;
 
               return obj;
             });
@@ -551,42 +1208,51 @@
           },
         });
         var dataEquipment = $.ajax({
-          url: "http://127.0.0.1:3000/api/iab/equipments",
+          url: "http://127.0.0.1:3000/api/equipments/1",
           dataType: "json",
           type: "GET",
           success: function (data) {
             var re = $.map(data, function (obj) {
-              obj.id = obj._id;
+              obj.id = obj.id;
               obj.text = obj.name;
-              delete obj._id;
-              delete obj.name;
-              delete obj.__v;
-              delete obj.addedDate;
-              delete obj.type;
+
               return obj;
             });
 
             $("#equipmentSelect").select2({ data: re });
           },
         });
+
         $("#iab #datePicker").val(new Date().toDateInputValue());
         //medicef
         var data = $.ajax({
-          url: "http://127.0.0.1:3000/api/medicef/products/",
+          url: "http://127.0.0.1:3000/api/products/2",
           dataType: "json",
           type: "GET",
           success: function (data) {
             var re = $.map(data, function (obj) {
-              obj.id = obj._id;
+              obj.id = obj.id;
               obj.text = obj.name;
-              delete obj._id;
-              delete obj.name;
-              delete obj.__v;
 
               return obj;
             });
 
-            $("#productSelect2").select2({ data: re });
+            $("#productSelectMedicef").select2({ data: re });
+          },
+        });
+        var dataEquipment = $.ajax({
+          url: "http://127.0.0.1:3000/api/equipments/2",
+          dataType: "json",
+          type: "GET",
+          success: function (data) {
+            var re = $.map(data, function (obj) {
+              obj.id = obj.id;
+              obj.text = obj.name;
+
+              return obj;
+            });
+
+            $("#equipmentSelectMedicef").select2({ data: re });
           },
         });
         $("#medicef #datePicker").val(new Date().toDateInputValue());

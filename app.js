@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 let ejs = require("ejs");
 var express = require("express");
 var app = express();
+var connection = require("./config/dbConfig");
 const mongoose = require("mongoose");
 var handlebars = require("express-handlebars");
 const passport = require("passport");
@@ -29,31 +30,8 @@ app.use(express.json());
 
 // Enables express to parse body data from x-www-form-encoded data
 app.use(bodyParser.urlencoded({ extended: true }));
-//!API
-const apiIABEquipments = require("./api/routes/IABequipments");
-app.use("/api/iab/equipments", apiIABEquipments);
-const apiMedocefEquipments = require("./api/routes/MEDICEFequipments");
-app.use("/api/medicef/equipments", apiMedocefEquipments);
-const apiRouterUsers = require("./api/routes/users");
-app.use("/api/users", apiRouterUsers);
-const apiIABProducts = require("./api/routes/IABproducts");
-app.use("/api/iab/products", apiIABProducts);
-const apiMedicefProducts = require("./api/routes/MEDICEFproducts");
-app.use("/api/medicef/products", apiMedicefProducts);
-
-const apiIABshifts = require("./api/routes/IABshifts");
-app.use("/api/iab/shifts", apiIABshifts);
-const apiMEDICEFshifts = require("./api/routes/MEDICEFshifts");
-app.use("/api/medicef/shifts", apiMEDICEFshifts);
-
-const initializePassport = require("./config/passport-config");
-/*initializePassport(
-  passport,
-  email => users.find(user => user.email === email),
-  id => users.find(user => user.id === id)
-)*/
-
 app.use(flash());
+
 const sessionStore = new MongoStore({
   mongooseConnection: mongoose.createConnection("mongodb://localhost/hikma", {
     useNewUrlParser: true,
@@ -73,6 +51,29 @@ app.use(
     },
   })
 );
+//!API
+const apiEquipments = require("./api/routes/equipments");
+app.use("/api/equipments", apiEquipments);
+const apiRouterUsers = require("./api/routes/users");
+app.use("/api/users", apiRouterUsers);
+const apiProducts = require("./api/routes/products");
+app.use("/api/products", apiProducts);
+const apiManuelDataENtry = require("./api/routes/manualDataEntry");
+app.use("/api/ManuelDataEntry", apiManuelDataENtry);
+const apiReports = require("./api/routes/reports");
+app.use("/api/reports", apiReports);
+
+const apiIABshifts = require("./api/routes/IABshifts");
+app.use("/api/iab/shifts", apiIABshifts);
+const apiMEDICEFshifts = require("./api/routes/MEDICEFshifts");
+app.use("/api/medicef/shifts", apiMEDICEFshifts);
+
+const initializePassport = require("./config/passport-config");
+/*initializePassport(
+  passport,
+  email => users.find(user => user.email === email),
+  id => users.find(user => user.id === id)
+)*/
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -203,26 +204,41 @@ app.get("/register", isAdmin, function (req, res) {
 });
 
 var test = 0;
-app.post("/register", checkAuthenticated, async function (req, res) {
-  try {
+app.post(
+  "/register",
+  checkAuthenticated,
+  passport.authenticate("local-signup", {
+    successRedirect: "/",
+    failureRedirect: "/register",
+    failureFlash: true,
+  })
+  /*try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    var newUser = new User({
-      name: req.body.name,
-      email: req.body.email,
-      password: hashedPassword,
-      department: req.body.department,
-      access: {
-        site: req.body.site,
-        type: req.body.type,
-      },
-      phone: req.body.phone,
-    });
-    newUser.save();
+
+    var name = req.body.name;
+    var email = req.body.email;
+    var password = hashedPassword;
+    var department = req.body.department;
+    var access = req.body.type;
+    var site = req.body.site;
+    var phone = req.body.phone;
+    var poste = req.body.position;
+    var sql =
+      " INSERT INTO `user` (`poste`, `name`, `phone`, `email`, `pwd`, `department`, `site_id`, `access`) \
+      VALUES (?,?,?,?,?,?,?,?);";
+    connection.query(
+      sql,
+      [poste, name, phone, email, password, department, site, access],
+      function (error, rows) {
+        if (error) console.log(error);
+        res.json({ message: " user inserted" });
+      }
+    );
     res.redirect("/accounts");
   } catch {
     res.redirect("/register");
-  }
-});
+  }*/
+);
 app.post(
   "/login",
   checkNotAuthenticated,
@@ -251,7 +267,7 @@ function checkAuthenticated(req, res, next) {
 }
 
 function isAdmin(req, res, next) {
-  if (req.isAuthenticated() && req.user.access.type === "ADMIN") {
+  if (req.isAuthenticated() && req.user.access === "ADMIN") {
     return next();
   }
 

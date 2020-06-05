@@ -89,7 +89,7 @@
         <!-- Main content -->
         <section class="content">
           <div class="row">
-            <% if (user.access.site=="ALL" || user.access.site=='IAB') { %>
+            <% if (user.site_id==1 || user.site_id==3) { %>
 
             <div class="col-12">
               <!-- /.card -->
@@ -362,8 +362,7 @@
 
               <!-- /.card -->
             </div>
-            <% } %> <% if (user.access.site=='ALL' ||
-            user.access.site=='MEDICEF') { %>
+            <% } %> <% if (user.site_id==2 || user.site_id==3) { %>
 
             <!--! SHIFT MEDICEF-->
             <div class="col-12">

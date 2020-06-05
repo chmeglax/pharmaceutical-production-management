@@ -9,6 +9,8 @@
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="/assets/dist/img/hikmaLogo2.png" />
+    <!-- Select2 -->
+    <link rel="stylesheet" href="/assets/plugins/select2/css/select2.min.css" />
 
     <!-- Font Awesome -->
     <link
@@ -26,6 +28,11 @@
     <link
       href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700"
       rel="stylesheet"
+    />
+    <!-- daterange picker -->
+    <link
+      rel="stylesheet"
+      href="assets/plugins/daterangepicker/daterangepicker.css"
     />
   </head>
   <body class="hold-transition sidebar-mini">
@@ -221,246 +228,415 @@
 
         <!-- Main content -->
         <section class="content">
-          <div class="container-fluid">
-            <div class="row">
-              <div class="col-md-6">
-                <!-- AREA CHART -->
-                <div class="card card-primary">
-                  <div class="card-header">
-                    <h3 class="card-title">Area Chart</h3>
+          <div class="row">
+            <div class="col-12">
+              <!-- /.card -->
+              <% if (user.site_id==1 || user.site_id==3) { %>
 
-                    <div class="card-tools">
-                      <button
-                        type="button"
-                        class="btn btn-tool"
-                        data-card-widget="collapse"
-                      >
-                        <i class="fas fa-minus"></i>
-                      </button>
-                      <button
-                        type="button"
-                        class="btn btn-tool"
-                        data-card-widget="remove"
-                      >
-                        <i class="fas fa-times"></i>
-                      </button>
-                    </div>
+              <div class="card card-outline card-danger" id="iab">
+                <div class="card-header" id="headingOne">
+                  <div class="card-title">
+                    <h3>IAB</h3>
                   </div>
-                  <div class="card-body">
-                    <div class="chart">
-                      <canvas
-                        id="areaChart"
-                        style="
-                          min-height: 250px;
-                          height: 250px;
-                          max-height: 250px;
-                          max-width: 100%;
-                        "
-                      ></canvas>
-                    </div>
+                  <div class="card-tools">
+                    <button
+                      type="button"
+                      class="btn btn-tool"
+                      data-card-widget="collapse"
+                    >
+                      <i class="fas fa-minus"></i>
+                    </button>
                   </div>
-                  <!-- /.card-body -->
                 </div>
-                <!-- /.card -->
+                <!-- /.card-header -->
+                <div class="card-body">
+                  <form role="form">
+                    <div class="card-body">
+                      <!-- Date range -->
+                      <div class="form-group">
+                        <label>Date range:</label>
 
-                <!-- DONUT CHART -->
-                <div class="card card-danger">
-                  <div class="card-header">
-                    <h3 class="card-title">Users</h3>
+                        <div class="input-group">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text">
+                              <i class="far fa-calendar-alt"></i>
+                            </span>
+                          </div>
+                          <input
+                            type="text"
+                            class="form-control float-right"
+                            id="reservation"
+                          />
+                        </div>
+                        <!-- /.input group -->
+                      </div>
 
-                    <div class="card-tools">
-                      <button
+                      <div class="form-group">
+                        <label for="equipmentSelect">Equipment</label>
+                        <select
+                          class="form-control select2 select2-primary"
+                          data-dropdown-css-class="select2-primary"
+                          style="width: 100%;"
+                          id="equipmentSelect"
+                          name="equipmentSelect"
+                        >
+                        </select>
+                      </div>
+                    </div>
+                    <!-- /.card-body -->
+                    <center>
+                      <input
                         type="button"
-                        class="btn btn-tool"
-                        data-card-widget="collapse"
-                      >
-                        <i class="fas fa-minus"></i>
-                      </button>
-                      <button
+                        class="btn btn-primary btn-lg custom-control-inline"
+                        id="performanceReport"
+                        value="Performance report"
+                      />
+                      <input
                         type="button"
-                        class="btn btn-tool"
-                        data-card-widget="remove"
+                        class="btn btn-primary btn-lg custom-control-inline"
+                        id="downtimeReport"
+                        value="Downtime report"
+                      />
+
+                      <!-- <a href="#"> <button 
+                        class="btn btn-primary btn-lg custom-control-inline" id="performanceReport"
                       >
-                        <i class="fas fa-times"></i>
-                      </button>
+                        <i class="iconn fa fa-users-cog"></i> Performance report
+                      </button></a>
+                      <button
+                        class="btn btn-primary btn-lg custom-control-inline"
+                      >
+                        <i class="iconn fa fa-business-time"></i> Downtime
+                        report
+                      </button>-->
+                    </center>
+                  </form>
+                  <br />
+                  <!--!! charts !!-->
+                  <div class="row">
+                    <div class="col-md-12">
+                      <!-- LINE CHART -->
+                      <div class="card card-info">
+                        <div class="card-header">
+                          <h3 class="card-title">OEE</h3>
+
+                          <div class="card-tools">
+                            <button
+                              type="button"
+                              class="btn btn-tool"
+                              data-card-widget="collapse"
+                            >
+                              <i class="fas fa-minus"></i>
+                            </button>
+                            <button
+                              type="button"
+                              class="btn btn-tool"
+                              data-card-widget="remove"
+                            >
+                              <i class="fas fa-times"></i>
+                            </button>
+                          </div>
+                        </div>
+                        <div class="card-body">
+                          <div class="row">
+                            <div class="col-sm-3">
+                              <div class="chart">
+                                <canvas
+                                  id="oee"
+                                  height="250"
+                                  width="100"
+                                ></canvas>
+                              </div>
+                            </div>
+                            <div class="col-sm-3">
+                              <div class="chart">
+                                <canvas
+                                  id="availibilityChart"
+                                  height="220"
+                                  width="50"
+                                ></canvas>
+                              </div>
+                            </div>
+                            <div class="col-sm-3">
+                              <div class="chart">
+                                <canvas
+                                  id="performanceChart"
+                                  height="220"
+                                  width="50"
+                                ></canvas>
+                              </div>
+                            </div>
+                            <div class="col-sm-3">
+                              <div class="chart">
+                                <canvas
+                                  id="qualityChart"
+                                  height="200"
+                                  width="50"
+                                ></canvas>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /.card-body -->
+                      </div>
+                    </div>
+                    <!-- /.col (LEFT) -->
+                    <div class="col-md-6">
+                      <div class="card card-primary">
+                        <div class="card-header">
+                          <h3 class="card-title">Area Chart</h3>
+
+                          <div class="card-tools">
+                            <button
+                              type="button"
+                              class="btn btn-tool"
+                              data-card-widget="collapse"
+                            >
+                              <i class="fas fa-minus"></i>
+                            </button>
+                            <button
+                              type="button"
+                              class="btn btn-tool"
+                              data-card-widget="remove"
+                            >
+                              <i class="fas fa-times"></i>
+                            </button>
+                          </div>
+                        </div>
+                        <div class="card-body">
+                          <div class="chart">
+                            <div class="chartjs-size-monitor">
+                              <div class="chartjs-size-monitor-expand">
+                                <div class=""></div>
+                              </div>
+                              <div class="chartjs-size-monitor-shrink">
+                                <div class=""></div>
+                              </div>
+                            </div>
+                            <canvas
+                              id="areaChart"
+                              style="
+                                min-height: 250px;
+                                height: 250px;
+                                max-height: 250px;
+                                max-width: 100%;
+                                display: block;
+                                width: 487px;
+                              "
+                              width="487"
+                              height="250"
+                              class="chartjs-render-monitor"
+                            ></canvas>
+                          </div>
+                        </div>
+                        <!-- /.card-body -->
+                      </div>
+
+                      <!-- /.card -->
+
+                      <!-- /.card -->
+                    </div>
+
+                    <!-- /.col (RIGHT) -->
+                    <!-- BAR CHART -->
+                    <!-- /.col (LEFT) -->
+                    <div class="col-md-6">
+                      <div class="card card-success">
+                        <div class="card-header">
+                          <h3 class="card-title">Bar Chart</h3>
+
+                          <div class="card-tools">
+                            <button
+                              type="button"
+                              class="btn btn-tool"
+                              data-card-widget="collapse"
+                            >
+                              <i class="fas fa-minus"></i>
+                            </button>
+                            <button
+                              type="button"
+                              class="btn btn-tool"
+                              data-card-widget="remove"
+                            >
+                              <i class="fas fa-times"></i>
+                            </button>
+                          </div>
+                        </div>
+                        <div class="card-body">
+                          <div class="chart">
+                            <canvas
+                              id="barChart"
+                              style="
+                                min-height: 250px;
+                                height: 250px;
+                                max-height: 250px;
+                                max-width: 100%;
+                              "
+                            ></canvas>
+                          </div>
+                        </div>
+                        <!-- /.card-body -->
+                      </div>
                     </div>
                   </div>
-                  <div class="card-body">
-                    <canvas
-                      id="donutChart"
-                      style="
-                        min-height: 250px;
-                        height: 250px;
-                        max-height: 250px;
-                        max-width: 100%;
-                      "
-                    ></canvas>
-                  </div>
-                  <!-- /.card-body -->
                 </div>
-                <!-- /.card -->
-
-                <!-- PIE CHART -->
-                <div class="card card-danger">
-                  <div class="card-header">
-                    <h3 class="card-title">Pie Chart</h3>
-
-                    <div class="card-tools">
-                      <button
-                        type="button"
-                        class="btn btn-tool"
-                        data-card-widget="collapse"
-                      >
-                        <i class="fas fa-minus"></i>
-                      </button>
-                      <button
-                        type="button"
-                        class="btn btn-tool"
-                        data-card-widget="remove"
-                      >
-                        <i class="fas fa-times"></i>
-                      </button>
-                    </div>
-                  </div>
-                  <div class="card-body">
-                    <canvas
-                      id="pieChart"
-                      style="
-                        min-height: 250px;
-                        height: 250px;
-                        max-height: 250px;
-                        max-width: 100%;
-                      "
-                    ></canvas>
-                  </div>
-                  <!-- /.card-body -->
-                </div>
-                <!-- /.card -->
               </div>
-              <!-- /.col (LEFT) -->
-              <div class="col-md-6">
-                <!-- LINE CHART -->
-                <div class="card card-info">
-                  <div class="card-header">
-                    <h3 class="card-title">Line Chart</h3>
+              <% } %> <% if (user.site_id==2 || user.site_id==3) { %>
 
-                    <div class="card-tools">
-                      <button
-                        type="button"
-                        class="btn btn-tool"
-                        data-card-widget="collapse"
-                      >
-                        <i class="fas fa-minus"></i>
-                      </button>
-                      <button
-                        type="button"
-                        class="btn btn-tool"
-                        data-card-widget="remove"
-                      >
-                        <i class="fas fa-times"></i>
-                      </button>
-                    </div>
+              <!--!medicef-->
+              <div class="card card-outline card-danger" id="medicef">
+                <div class="card-header" id="headingOne">
+                  <div class="card-title">
+                    <h3>MEDICEF</h3>
                   </div>
-                  <div class="card-body">
-                    <div class="chart">
-                      <canvas
-                        id="lineChart"
-                        style="
-                          min-height: 250px;
-                          height: 250px;
-                          max-height: 250px;
-                          max-width: 100%;
-                        "
-                      ></canvas>
-                    </div>
+                  <div class="card-tools">
+                    <button
+                      type="button"
+                      class="btn btn-tool"
+                      data-card-widget="collapse"
+                    >
+                      <i class="fas fa-minus"></i>
+                    </button>
                   </div>
-                  <!-- /.card-body -->
                 </div>
-                <!-- /.card -->
+                <!-- /.card-header -->
+                <div class="card-body">
+                  <form role="form">
+                    <div class="card-body">
+                      <div class="form-group">
+                        <label for="datePicker">Date</label>
+                        <input
+                          type="date"
+                          id="datePicker"
+                          class="form-control"
+                        />
+                      </div>
+                      <div class="form-group">
+                        <label for="productSelect2">Product</label>
+                        <select
+                          class="form-control select2 select2-primary"
+                          data-dropdown-css-class="select2-primary"
+                          style="width: 100%;"
+                          id="productSelect2"
+                        >
+                        </select>
+                      </div>
 
-                <!-- BAR CHART -->
-                <div class="card card-success">
-                  <div class="card-header">
-                    <h3 class="card-title">Bar Chart</h3>
+                      <div class="form-group clearfix">
+                        <div class="icheck-danger d-inline">
+                          <input
+                            type="checkbox"
+                            checked=""
+                            id="checkboxDanger1"
+                          />
+                          <label for="checkboxDanger1">
+                            Waiting for Materials</label
+                          >
+                        </div>
+                        <br />
 
-                    <div class="card-tools">
-                      <button
-                        type="button"
-                        class="btn btn-tool"
-                        data-card-widget="collapse"
-                      >
-                        <i class="fas fa-minus"></i>
-                      </button>
-                      <button
-                        type="button"
-                        class="btn btn-tool"
-                        data-card-widget="remove"
-                      >
-                        <i class="fas fa-times"></i>
-                      </button>
+                        <div class="icheck-danger d-inline">
+                          <input type="checkbox" id="checkboxDanger2" />
+                          <label for="checkboxDanger2">
+                            Waiting for operators</label
+                          >
+                        </div>
+                        <br />
+                        <div class="icheck-danger d-inline">
+                          <input type="checkbox" id="checkboxDanger3" />
+                          <label for="checkboxDanger3">
+                            Waiting for Quality
+                          </label>
+                        </div>
+                        <br />
+                        <div class="icheck-danger d-inline">
+                          <input type="checkbox" id="checkboxDanger4" />
+                          <label for="checkboxDanger4">
+                            Waiting for QVM
+                          </label>
+                        </div>
+                        <br />
+                        <div class="icheck-danger d-inline">
+                          <input type="checkbox" id="checkboxDanger5" />
+                          <label for="checkboxDanger5">
+                            Waiting for Maint.
+                          </label>
+                        </div>
+                      </div>
+                      <div class="form-group clearfix">
+                        <div class="icheck-danger d-inline">
+                          <input
+                            type="checkbox"
+                            checked=""
+                            id="lackOfElectricity"
+                          />
+                          <label for="lackOfElectricity">
+                            Lack of Electricity</label
+                          >
+                        </div>
+                        <br />
+
+                        <div class="icheck-danger d-inline">
+                          <input type="checkbox" id="lackOfAir" />
+                          <label for="lackOfAir"> Lack of comp.air</label>
+                        </div>
+                        <br />
+                        <div class="icheck-danger d-inline">
+                          <input type="checkbox" id="lackOfWater" />
+                          <label for="lackOfWater">
+                            Lack of water
+                          </label>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="numberOfBreakdowns"
+                          >Number of breakdowns
+                        </label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="numberOfBreakdowns"
+                          placeholder="Enter Number of breakdowns
+                          "
+                        />
+                      </div>
+                      <div class="form-group">
+                        <label for="plannedQty">Planned Qty </label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="plannedQty"
+                          placeholder="Enter planned Qty"
+                        />
+                      </div>
+                      <div class="form-group">
+                        <label
+                          for="producedQty
+                      "
+                          >Produced Qty
+                        </label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="producedQty"
+                          placeholder="Enter produced Qty"
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <div class="card-body">
-                    <div class="chart">
-                      <canvas
-                        id="barChart"
-                        style="
-                          min-height: 250px;
-                          height: 250px;
-                          max-height: 250px;
-                          max-width: 100%;
-                        "
-                      ></canvas>
-                    </div>
-                  </div>
-                  <!-- /.card-body -->
+                    <!-- /.card-body -->
+
+                    <button type="submit" class="btn btn-primary">
+                      Submit
+                    </button>
+                  </form>
                 </div>
-                <!-- /.card -->
-
-                <!-- STACKED BAR CHART -->
-                <div class="card card-success">
-                  <div class="card-header">
-                    <h3 class="card-title">Stacked Bar Chart</h3>
-
-                    <div class="card-tools">
-                      <button
-                        type="button"
-                        class="btn btn-tool"
-                        data-card-widget="collapse"
-                      >
-                        <i class="fas fa-minus"></i>
-                      </button>
-                      <button
-                        type="button"
-                        class="btn btn-tool"
-                        data-card-widget="remove"
-                      >
-                        <i class="fas fa-times"></i>
-                      </button>
-                    </div>
-                  </div>
-                  <div class="card-body">
-                    <div class="chart">
-                      <canvas
-                        id="stackedBarChart"
-                        style="
-                          min-height: 250px;
-                          height: 250px;
-                          max-height: 250px;
-                          max-width: 100%;
-                        "
-                      ></canvas>
-                    </div>
-                  </div>
-                  <!-- /.card-body -->
-                </div>
-                <!-- /.card -->
               </div>
-              <!-- /.col (RIGHT) -->
+              <% } %>
+
+              <!-- /.card -->
             </div>
-            <!-- /.row -->
           </div>
-          <!-- /.container-fluid -->
+          <!-- /.row -->
         </section>
         <!-- /.content -->
       </div>
@@ -488,215 +664,19 @@
     <script src="assets/plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
     <script src="assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Select2 -->
+    <script src="assets/plugins/select2/js/select2.full.min.js"></script>
+
     <!-- ChartJS -->
     <script src="assets/plugins/chart.js/Chart.min.js"></script>
+
+    <!-- date-range-picker -->
+    <script src="/assets/plugins/moment/moment.min.js"></script>
+    <script src="/assets/plugins/daterangepicker/daterangepicker.js"></script>
     <!-- hikma App -->
     <script src="assets/dist/js/adminlte.min.js"></script>
     <!-- hikma for demo purposes -->
     <script src="assets/dist/js/demo.js"></script>
-    <!-- page script -->
-    <script>
-      $("#statistiquesNav").addClass("active");
-      $(function () {
-        /* ChartJS
-         * -------
-         * Here we will create a few charts using ChartJS
-         */
-
-        //--------------
-        //- AREA CHART -
-        //--------------
-
-        // Get context with jQuery - using jQuery's .get() method.
-        var areaChartCanvas = $("#areaChart").get(0).getContext("2d");
-
-        var areaChartData = {
-          labels: [
-            "January",
-            "February",
-            "March",
-            "April",
-            "May",
-            "June",
-            "July",
-          ],
-          datasets: [
-            {
-              label: "Digital Goods",
-              backgroundColor: "rgba(60,141,188,0.9)",
-              borderColor: "rgba(60,141,188,0.8)",
-              pointRadius: false,
-              pointColor: "#3b8bba",
-              pointStrokeColor: "rgba(60,141,188,1)",
-              pointHighlightFill: "#fff",
-              pointHighlightStroke: "rgba(60,141,188,1)",
-              data: [28, 48, 40, 19, 86, 27, 90],
-            },
-            {
-              label: "Electronics",
-              backgroundColor: "rgba(210, 214, 222, 1)",
-              borderColor: "rgba(210, 214, 222, 1)",
-              pointRadius: false,
-              pointColor: "rgba(210, 214, 222, 1)",
-              pointStrokeColor: "#c1c7d1",
-              pointHighlightFill: "#fff",
-              pointHighlightStroke: "rgba(220,220,220,1)",
-              data: [65, 59, 80, 81, 56, 55, 40],
-            },
-          ],
-        };
-
-        var areaChartOptions = {
-          maintainAspectRatio: false,
-          responsive: true,
-          legend: {
-            display: false,
-          },
-          scales: {
-            xAxes: [
-              {
-                gridLines: {
-                  display: false,
-                },
-              },
-            ],
-            yAxes: [
-              {
-                gridLines: {
-                  display: false,
-                },
-              },
-            ],
-          },
-        };
-
-        // This will get the first returned node in the jQuery collection.
-        var areaChart = new Chart(areaChartCanvas, {
-          type: "line",
-          data: areaChartData,
-          options: areaChartOptions,
-        });
-
-        //-------------
-        //- LINE CHART -
-        //--------------
-        var lineChartCanvas = $("#lineChart").get(0).getContext("2d");
-        var lineChartOptions = jQuery.extend(true, {}, areaChartOptions);
-        var lineChartData = jQuery.extend(true, {}, areaChartData);
-        lineChartData.datasets[0].fill = false;
-        lineChartData.datasets[1].fill = false;
-        lineChartOptions.datasetFill = false;
-
-        var lineChart = new Chart(lineChartCanvas, {
-          type: "line",
-          data: lineChartData,
-          options: lineChartOptions,
-        });
-
-        //-------------
-        //- DONUT CHART -
-        //-------------
-        // Get context with jQuery - using jQuery's .get() method.
-        var donutChartCanvas = $("#donutChart").get(0).getContext("2d");
-        var donutData = {
-          labels: ["IAB", "MEDICEF"],
-          datasets: [
-            {
-              data: [700, 500],
-              backgroundColor: [
-                "#f56954",
-                "#00a65a",
-                "#f39c12",
-                "#00c0ef",
-                "#3c8dbc",
-                "#d2d6de",
-              ],
-            },
-          ],
-        };
-        var donutOptions = {
-          maintainAspectRatio: false,
-          responsive: true,
-        };
-        //Create pie or douhnut chart
-        // You can switch between pie and douhnut using the method below.
-        var donutChart = new Chart(donutChartCanvas, {
-          type: "doughnut",
-          data: donutData,
-          options: donutOptions,
-        });
-
-        //-------------
-        //- PIE CHART -
-        //-------------
-        // Get context with jQuery - using jQuery's .get() method.
-        var pieChartCanvas = $("#pieChart").get(0).getContext("2d");
-        var pieData = donutData;
-        var pieOptions = {
-          maintainAspectRatio: false,
-          responsive: true,
-        };
-        //Create pie or douhnut chart
-        // You can switch between pie and douhnut using the method below.
-        var pieChart = new Chart(pieChartCanvas, {
-          type: "pie",
-          data: pieData,
-          options: pieOptions,
-        });
-
-        //-------------
-        //- BAR CHART -
-        //-------------
-        var barChartCanvas = $("#barChart").get(0).getContext("2d");
-        var barChartData = jQuery.extend(true, {}, areaChartData);
-        var temp0 = areaChartData.datasets[0];
-        var temp1 = areaChartData.datasets[1];
-        barChartData.datasets[0] = temp1;
-        barChartData.datasets[1] = temp0;
-
-        var barChartOptions = {
-          responsive: true,
-          maintainAspectRatio: false,
-          datasetFill: false,
-        };
-
-        var barChart = new Chart(barChartCanvas, {
-          type: "bar",
-          data: barChartData,
-          options: barChartOptions,
-        });
-
-        //---------------------
-        //- STACKED BAR CHART -
-        //---------------------
-        var stackedBarChartCanvas = $("#stackedBarChart")
-          .get(0)
-          .getContext("2d");
-        var stackedBarChartData = jQuery.extend(true, {}, barChartData);
-
-        var stackedBarChartOptions = {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            xAxes: [
-              {
-                stacked: true,
-              },
-            ],
-            yAxes: [
-              {
-                stacked: true,
-              },
-            ],
-          },
-        };
-
-        var stackedBarChart = new Chart(stackedBarChartCanvas, {
-          type: "bar",
-          data: stackedBarChartData,
-          options: stackedBarChartOptions,
-        });
-      });
-    </script>
+    <script src="assets\dist\js\statistiques.js"></script>
   </body>
 </html>

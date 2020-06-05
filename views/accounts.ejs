@@ -186,7 +186,7 @@
 
       function responseHandler(res) {
         $.each(res.rows, function (i, row) {
-          row.state = $.inArray(row._id, selections) !== -1;
+          row.state = $.inArray(row.id, selections) !== -1;
         });
         return res;
       }
@@ -254,10 +254,10 @@
         "click .btn-info": function (e, value, row, index) {
           console.log(row);
           $("#editUserModal #name").val(row.name);
-          $("#editUserModal #id").val(row._id);
-          $("#editUserModal #site").val(row.access.site.toUpperCase());
-          $("#editUserModal #type").val(row.access.type.toUpperCase());
-          $("#editUserModal #department").val(row.department);
+          $("#editUserModal #id").val(row.id);
+          $("#editUserModal #site").val(row.site_id);
+          $("#editUserModal #type").val(row.access.toUpperCase());
+          $("#editUserModal #department").val(row.dep_id);
           $("#editUserModal #phone").val(row.phone);
           $("#editUserModal #email").val(row.email);
 
@@ -285,7 +285,7 @@
             .then((result) => {
               if (result.value) {
                 $.ajax({
-                  url: "http://127.0.0.1:3000/api/users/" + row._id,
+                  url: "http://127.0.0.1:3000/api/users/" + row.id,
                   method: "delete",
                   success: function (response) {
                     $("#table").bootstrapTable("refresh");
@@ -335,7 +335,7 @@
             [
               {
                 title: "Item ID",
-                field: "_id",
+                field: "id",
                 align: "center",
                 valign: "middle",
                 visible: false,
@@ -357,7 +357,16 @@
                 title: "Email",
                 sortable: true,
                 align: "center",
+                rowspan: 2,
                 footerFormatter: totalNameFormatter,
+                valign: "middle",
+              },
+              {
+                field: "phone",
+                title: "Phone",
+                sortable: true,
+                align: "center",
+
                 rowspan: 2,
                 valign: "middle",
               },
@@ -390,7 +399,7 @@
             ],
             [
               {
-                field: "access.site",
+                field: "site",
                 title: "Site",
                 sortable: true,
                 align: "center",
@@ -398,7 +407,7 @@
                 printIgnore: true,
               },
               {
-                field: "access.type",
+                field: "access",
                 title: "Type",
                 sortable: true,
                 align: "center",

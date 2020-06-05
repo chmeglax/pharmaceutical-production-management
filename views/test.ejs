@@ -46,152 +46,399 @@
     </style>
   </head>
   <body>
-    <div id="toolbar">
-      <button id="add" class="btn btn-success">
-        <i class="glyphicon glyphicon-add"></i> Add
-      </button>
+    <div id="container">
+      <canvas id="chart" height="350" width="200"></canvas>
     </div>
-    <table
-      id="table"
-      data-toolbar="#toolbar"
-      data-search="true"
-      data-show-refresh="true"
-      data-show-toggle="true"
-      data-show-fullscreen="true"
-      data-show-columns="true"
-      data-show-columns-toggle-all="true"
-      data-show-export="true"
-      data-click-to-select="true"
-      data-detail-formatter="detailFormatter"
-      data-minimum-count-columns="2"
-      data-show-pagination-switch="true"
-      data-pagination="true"
-      data-id-field="id"
-      data-page-list="[10, 25, 50, 100, all]"
-      data-show-footer="true"
-      data-side-pagination="server"
-      data-url="http://127.0.0.1:3000/api/"
-      data-response-handler="responseHandler"
-    ></table>
+    <div id="container">
+      <canvas id="chart2" height="350" width="200"></canvas>
+    </div>
+    <!-- jQuery -->
+    <script src="assets/plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Select2 -->
+    <script src="assets/plugins/select2/js/select2.full.min.js"></script>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script>
-    <script src="https://unpkg.com/bootstrap-table@1.16.0/dist/extensions/export/bootstrap-table-export.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <!-- date-range-picker -->
+    <script src="/assets/plugins/moment/moment.min.js"></script>
+    <script src="/assets/plugins/daterangepicker/daterangepicker.js"></script>
 
-    <script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
-    <script src="https://unpkg.com/tableexport.jquery.plugin/libs/jsPDF/jspdf.min.js"></script>
-    <script src="https://unpkg.com/tableexport.jquery.plugin/libs/jsPDF-AutoTable/jspdf.plugin.autotable.js"></script>
-    <script src="/assets/plugins/sweetalert2/sweetalert2.js"></script>
+    <!-- ChartJS -->
+    <script src="assets/plugins/chart.js/Chart.min.js"></script>
+    <!-- hikma App -->
+    <script src="assets/dist/js/adminlte.min.js"></script>
+    <!-- hikma for demo purposes -->
+    <script src="assets/dist/js/demo.js"></script>
     <script>
-      var $table = $("#table");
+      const red_min_hex = "45";
+      const red_min_dec = parseInt(red_min_hex, 16);
+      const red_max_hex = "cc";
+      const red_max_dec = parseInt(red_max_hex, 16);
+      const green_min_hex = "35";
+      const green_min_dec = parseInt(green_min_hex, 16);
+      const green_max_hex = "ac";
+      const green_max_dec = parseInt(green_max_hex, 16);
+      const blue_min_hex = "20";
+      const blue_min_dec = parseInt(blue_min_hex, 16);
+      const blue_max_hex = "78";
+      const blue_max_dec = parseInt(blue_max_hex, 16);
 
-      var $add = $("#add");
+      const pi = Math.PI;
 
-      function responseHandler(res) {
-        $.each(res.rows, function (i, row) {
-          row.state = $.inArray(row._id, selections) !== -1;
-        });
-        return res;
-      }
+      const animateArc = (chart) => {
+        let arc = chart.getDatasetMeta(0).data[0];
+        let angle = arc._view.endAngle + pi / 2;
+        let angle_inverse = 2 * pi - angle;
+        let blue = Math.round(
+          (angle / (2 * pi)) * blue_max_dec +
+            (angle_inverse / (2 * pi)) * blue_min_dec
+        ).toString(16);
+        if (arc._view.endAngle < pi / 2) {
+          let green = Math.round(
+            (angle / pi) * green_max_dec + ((pi - angle) / pi) * green_min_dec
+          ).toString(16);
+          if (green.length < 2) green = "0" + green;
+          let color = `#${red_max_hex}${green}${blue}`;
+          arc.round.backgroundColor = color;
+          drawArc(chart, arc, color);
+        } else {
+          let red = Math.round(
+            ((2 * pi - angle) / pi) * red_max_dec +
+              ((angle - pi) / pi) * red_min_dec
+          ).toString(16);
+          if (red.length < 2) red = "0" + red;
+          if (red === "45") red = 50;
+          if (blue === "78") blue = 74;
+          let color = `#${red}${green_max_hex}${blue}`;
+          arc.round.backgroundColor = color;
+          drawArc(chart, arc, color);
+        }
+      };
 
-      function operateFormatter(value, row, index) {
-        return [
-          '<a class="edit" href="javascript:void(0)" title="edit" >',
-          '<i class="fa fa-edit fa-lg" style="color:green"></i>',
-          "</a>  ",
-          '<a class="remove" href="javascript:void(0)" title="Remove">',
-          '<i class="fa fa-trash fa-lg" style="color:red"></i>',
-          "</a>",
-        ].join("");
-      }
+      const drawArc = (chartm, arc, color) => {
+        let x = (chartm.chartArea.left + chartm.chartArea.right) / 2;
+        let y = (chartm.chartArea.top + chartm.chartArea.bottom) / 2;
+        chartm.ctx.fillStyle = color;
+        chartm.ctx.strokeStyle = color;
+        chartm.ctx.beginPath();
+        if (arc != null) {
+          chartm.ctx.arc(
+            x,
+            y,
+            chartm.outerRadius,
+            arc._view.startAngle,
+            arc._view.endAngle
+          );
+          chartm.ctx.arc(
+            x,
+            y,
+            chartm.innerRadius,
+            arc._view.endAngle,
+            arc._view.startAngle,
+            true
+          );
+        } else {
+          chartm.ctx.arc(x, y, chartm.outerRadius, 0, 2 * pi);
+          chartm.ctx.arc(x, y, chartm.innerRadius, 0, 2 * pi, true);
+        }
+        chartm.ctx.fill();
+      };
 
-      window.operateEvents = {
-        "click .edit": function (e, value, row, index) {
-          $("#editEquipmentModal #name").val(row.name);
-          $("#editEquipmentModal #id").val(row._id);
+      const drawArc2 = (chartm, arc, color) => {
+        let x = (chart.chartArea.left + chart2.chartArea.right) / 2;
+        let y = (chart2.chartArea.top + chart2.chartArea.bottom) / 2;
+        chart2.ctx.fillStyle = color;
+        chart2.ctx.strokeStyle = color;
+        chart2.ctx.beginPath();
+        if (arc != null) {
+          chart2.ctx.arc(
+            x,
+            y,
+            chart2.outerRadius,
+            arc._view.startAngle,
+            arc._view.endAngle
+          );
+          chart2.ctx.arc(
+            x,
+            y,
+            chart2.innerRadius,
+            arc._view.endAngle,
+            arc._view.startAngle,
+            true
+          );
+        } else {
+          chart2.ctx.arc(x, y, chart2.outerRadius, 0, 2 * pi);
+          chart2.ctx.arc(x, y, chart2.innerRadius, 0, 2 * pi, true);
+        }
+        chart2.ctx.fill();
+      };
 
-          $("#editEquipmentModal").modal("toggle");
+      const addCenterTextAfterUpdate = (chart) => {
+        if (
+          chart.config.options.elements.center &&
+          chart.config.options.elements.centerSub &&
+          chart.ctx
+        ) {
+          const centerConfig = chart.config.options.elements.center;
+          const centerConfigSub = chart.config.options.elements.centerSub;
+          const globalConfig = Chart.defaults.global;
+          let fontStyle = centerConfig.fontStyle;
+          let fontFamily = Chart.helpers.getValueOrDefault(
+            centerConfig.fontFamily,
+            "Roboto"
+          );
+          let fontSize = Chart.helpers.getValueOrDefault(
+            centerConfig.minFontSize,
+            20
+          );
+          let maxFontSize = Chart.helpers.getValueOrDefault(
+            centerConfig.maxFontSize,
+            90
+          );
+          let maxText = Chart.helpers.getValueOrDefault(
+            centerConfig.maxText,
+            centerConfig.text
+          );
+          do {
+            chart.ctx.font = Chart.helpers.fontString(
+              fontSize,
+              fontStyle,
+              fontFamily
+            );
+            let textWidth = chart.ctx.measureText(maxText).width;
+            if (textWidth < chart.innerRadius * 2 && fontSize < maxFontSize)
+              fontSize += 1;
+            else {
+              fontSize -= 1;
+              break;
+            }
+          } while (true);
+          chart.center = {
+            font: Chart.helpers.fontString(fontSize, fontStyle, fontFamily),
+            fillStyle: Chart.helpers.getValueOrDefault(
+              centerConfig.fontColor,
+              globalConfig.defaultFontColor
+            ),
+          };
+          fontSize = Chart.helpers.getValueOrDefault(
+            centerConfigSub.minFontSize,
+            10
+          );
+          maxFontSize = Chart.helpers.getValueOrDefault(
+            centerConfigSub.maxFontSize,
+            25
+          );
+          maxText = centerConfigSub.text;
+          do {
+            chart.ctx.font = Chart.helpers.fontString(
+              fontSize,
+              fontStyle,
+              fontFamily
+            );
+            let textWidth = chart.ctx.measureText(maxText).width;
+            if (textWidth < chart.innerRadius * 2 && fontSize < maxFontSize)
+              fontSize += 1;
+            else {
+              fontSize -= 1;
+              break;
+            }
+          } while (true);
+          chart.centerSub = {
+            font: Chart.helpers.fontString(fontSize, fontStyle, fontFamily),
+            fillStyle: Chart.helpers.getValueOrDefault(
+              centerConfigSub.fontColor,
+              globalConfig.defaultFontColor
+            ),
+          };
+        }
+      };
+
+      const roundCornersAfterUpdate = (chart) => {
+        if (chart.config.options.elements.arc.roundCorners !== undefined) {
+          let arc = chart.getDatasetMeta(0).data[
+            chart.config.options.elements.arc.roundCorners
+          ];
+          arc.round = {
+            x: (chart.chartArea.left + chart.chartArea.right) / 2,
+            y: (chart.chartArea.top + chart.chartArea.bottom) / 2,
+            radius: (chart.outerRadius + chart.innerRadius) / 2,
+            thickness: (chart.outerRadius - chart.innerRadius) / 2,
+            backgroundColor: arc._model.backgroundColor,
+          };
+        }
+      };
+
+      const addCenterTextAfterDraw = (chart) => {
+        if (chart.center && chart.centerSub) {
+          chart.ctx.textAlign = "center";
+          chart.ctx.textBaseline = "middle";
+          const centerX = (chart.chartArea.left + chart.chartArea.right) / 2;
+          const centerY = (chart.chartArea.top + chart.chartArea.bottom) / 2;
+          const lowerY =
+            (chart.chartArea.top + chart.chartArea.bottom) / 2 + 65;
+          const centerConfig = chart.config.options.elements.center;
+          chart.ctx.font = chart.center.font;
+          chart.ctx.fillStyle = chart.center.fillStyle;
+          chart.ctx.fillText(centerConfig.text, centerX, centerY);
+          const centerSubConfig = chart.config.options.elements.centerSub;
+          chart.ctx.font = chart.centerSub.font;
+          chart.ctx.fillStyle = chart.centerSub.fillStyle;
+          chart.ctx.fillText(centerSubConfig.text, centerX, lowerY);
+        }
+      };
+
+      const roundCornersAfterDraw = (chart) => {
+        if (chart.config.options.elements.arc.roundCorners !== undefined) {
+          var arc = chart.getDatasetMeta(0).data[
+            chart.config.options.elements.arc.roundCorners
+          ];
+          var startAngle = pi / 2 - arc._view.startAngle;
+          var endAngle = pi / 2 - arc._view.endAngle;
+          chart.ctx.save();
+          chart.ctx.translate(arc.round.x, arc.round.y);
+          chart.ctx.fillStyle = arc.round.backgroundColor;
+          chart.ctx.beginPath();
+          chart.ctx.arc(
+            arc.round.radius * Math.sin(startAngle),
+            arc.round.radius * Math.cos(startAngle),
+            arc.round.thickness,
+            0,
+            2 * pi
+          );
+          chart.ctx.arc(
+            arc.round.radius * Math.sin(endAngle),
+            arc.round.radius * Math.cos(endAngle),
+            arc.round.thickness,
+            0,
+            2 * pi
+          );
+          chart.ctx.fill();
+          chart.ctx.restore();
+        }
+      };
+
+      var datasets = [
+        {
+          data: [84, 16],
+          backgroundColor: ["#e0e0e0", "#e0e0e0"],
         },
-        "click .remove": function (e, value, row, index) {
-          $("#deleteEquipmentModal #id").val(row._id);
-
-          $("#deleteEquipmentModal").modal("toggle");
+      ];
+      var chartData = {
+        type: "doughnut",
+        data: { datasets: datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutoutPercentage: 90,
+          segmentShowStroke: false,
+          events: [],
+          elements: {
+            arc: {
+              roundCorners: 0,
+              borderWidth: 0,
+            },
+            center: {
+              maxText: "100%",
+              text: `${datasets[0].data[0]}`,
+              fontColor: "#646464",
+              fontFamily: "Roboto",
+              fontStyle: "normal",
+              minFontSize: 20,
+              maxFontSize: 50,
+            },
+            centerSub: {
+              text: `${datasets[0].data[1]} is the remainder.`,
+              fontColor: "#a6a6a6",
+              minFontSize: 10,
+              maxFontSize: 25,
+            },
+          },
+          animation: {
+            onProgress: (animation) => {
+              animation.easing = "linear";
+              animateArc(animation.chart);
+            },
+          },
         },
       };
 
-      function totalTextFormatter(data) {
-        return "Total";
-      }
-
-      function totalNameFormatter(data) {
-        return data.length;
-      }
-
-      function initTable() {
-        $table.bootstrapTable("destroy").bootstrapTable({
-          exportTypes: ["json", "xml", "csv", "txt", "sql", "excel", "pdf"],
-          exportDataType: "all",
-          exportOptions: {
-            fileName: "equipments",
-            ignoreColumn: ["operate"],
-            jspdf: {
-              format: "a4",
-              margins: { left: 10, right: 10, top: 20, bottom: 20 },
+      var ctx = $("#chart").get(0).getContext("2d");
+      var chart = new Chart(ctx, {
+        ...chartData,
+        plugins: [
+          {
+            beforeDraw: (chart) => {
+              drawArc(chart, null, "#e0e0e0");
             },
+            afterUpdate: (chart) => {
+              addCenterTextAfterUpdate(chart);
+              roundCornersAfterUpdate(chart);
+            },
+            afterDraw: (chart) => {
+              addCenterTextAfterDraw(chart);
+              roundCornersAfterDraw(chart);
+            },
+            resize: () =>
+              new Chart(ctx, {
+                ...chartData,
+                plugins: [
+                  {
+                    beforeDraw: (chart) => {
+                      drawArc(chart, null, "#e0e0e0");
+                    },
+                    afterUpdate: (chart) => {
+                      addCenterTextAfterUpdate(chart);
+                      roundCornersAfterUpdate(chart);
+                    },
+                    afterDraw: (chart) => {
+                      addCenterTextAfterDraw(chart);
+                      roundCornersAfterDraw(chart);
+                    },
+                  },
+                ],
+              }),
           },
+        ],
+      });
 
-          columns: [
-            {
-              title: "Item ID",
-              field: "_id",
-              align: "center",
-              valign: "middle",
-              visible: false,
-
-              footerFormatter: totalTextFormatter,
+      var ctx2 = $("#chart2").get(0).getContext("2d");
+      var chart2 = new Chart(ctx2, {
+        ...chartData,
+        plugins: [
+          {
+            beforeDraw: (chart2) => {
+              drawArc(chart2, null, "#e0e0e0");
             },
-
-            {
-              field: "name",
-              title: "Item Name",
-              sortable: true,
-              footerFormatter: totalTextFormatter,
-              align: "center",
+            afterUpdate: (chart2) => {
+              addCenterTextAfterUpdate(chart2);
+              roundCornersAfterUpdate(chart2);
             },
-            {
-              field: "addedDate",
-              title: "Date",
-              sortable: true,
-              align: "center",
-              footerFormatter: totalNameFormatter,
+            afterDraw: (chart2) => {
+              addCenterTextAfterDraw(chart2);
+              roundCornersAfterDraw(chart2);
             },
-            {
-              field: "operate",
-              title: "Item Operate",
-              align: "center",
-              clickToSelect: false,
-              events: window.operateEvents,
-              formatter: operateFormatter,
-            },
-          ],
-        });
-
-        $add.click(function () {
-          $("#addEquipmentModal").modal("toggle");
-        });
-      }
-      var Toast;
-      $(function () {
-        initTable();
-        Toast = Swal.mixin({
-          toast: true,
-          position: "top-end",
-          showConfirmButton: false,
-          timer: 3000,
-        });
+            resize: () =>
+              new Chart(ctx2, {
+                ...chartData,
+                plugins: [
+                  {
+                    beforeDraw: (chart2) => {
+                      drawArc(chart2, null, "#e0e0e0");
+                    },
+                    afterUpdate: (chart2) => {
+                      addCenterTextAfterUpdate(chart2);
+                      roundCornersAfterUpdate(chart2);
+                    },
+                    afterDraw: (chart2) => {
+                      addCenterTextAfterDraw(chart2);
+                      roundCornersAfterDraw(chart2);
+                    },
+                  },
+                ],
+              }),
+          },
+        ],
       });
     </script>
-    <%- include('partials/modals') %>
   </body>
 </html>

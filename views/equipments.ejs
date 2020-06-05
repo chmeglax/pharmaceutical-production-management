@@ -80,7 +80,7 @@
         <!-- Main content -->
         <section class="content">
           <div class="row">
-            <% if (user.access.site=="ALL" || user.access.site=='IAB') { %>
+            <% if (user.site_id==3 || user.site_id==1) { %>
 
             <div class="col-12">
               <!-- /.card -->
@@ -129,15 +129,14 @@
                     data-id-field="id"
                     data-page-list="[10, 25, 50, 100, all]"
                     data-show-footer="true"
-                    data-url="http://127.0.0.1:3000/api/iab/equipments/"
+                    data-url="http://127.0.0.1:3000/api/equipments/1"
                     data-response-handler="responseHandler"
                     data-show-print="true"
                   ></table>
                 </div>
               </div>
             </div>
-            <% } %> <% if (user.access.site=='ALL' ||
-            user.access.site=='MEDICEF') { %>
+            <% } %> <% if (user.site_id==2 || user.site_id==3) { %>
 
             <div class="col-12">
               <div class="card card-outline card-danger">
@@ -183,7 +182,7 @@
                     data-id-field="id"
                     data-page-list="[10, 25, 50, 100, all]"
                     data-show-footer="true"
-                    data-url="http://127.0.0.1:3000/api/medicef/equipments/"
+                    data-url="http://127.0.0.1:3000/api/equipments/2"
                     data-response-handler="responseHandler"
                     data-show-print="true"
                   ></table>
@@ -241,7 +240,7 @@
       var $addMEDICEF = $("#addMEDICEF");
       function responseHandler(res) {
         $.each(res.rows, function (i, row) {
-          row.state = $.inArray(row._id, selections) !== -1;
+          row.state = $.inArray(row.id, selections) !== -1;
         });
         return res;
       }
@@ -258,8 +257,8 @@
       window.operateEvents = {
         "click .btn-info": function (e, value, row, index) {
           $("#editEquipmentModal #name").val(row.name);
-          //$("#editEquipmentModal #type").val(row.type.toLowerCase());
-          $("#editEquipmentModal #id").val(row._id);
+          $("#editEquipmentModal #type").val(row.parcId);
+          $("#editEquipmentModal #id").val(row.id);
 
           $("#editEquipmentModal").modal("toggle");
         },
@@ -285,7 +284,7 @@
             .then((result) => {
               if (result.value) {
                 $.ajax({
-                  url: "http://127.0.0.1:3000/api/iab/equipments/" + row._id,
+                  url: "http://127.0.0.1:3000/api/equipments/" + row.id,
                   method: "delete",
                   success: function (response) {
                     $("#table").bootstrapTable("refresh");
@@ -310,14 +309,14 @@
         },
       };
       window.operateEventsMedicef = {
-        "click .edit": function (e, value, row, index) {
+        "click .btn-info": function (e, value, row, index) {
           $("#editEquipmentMedicefModal #name").val(row.name);
-          //$("#editEquipmentModal #type").val(row.type.toLowerCase());
-          $("#editEquipmentMedicefModal #id").val(row._id);
+          $("#editEquipmentMedicefModal #type").val(row.parcId);
+          $("#editEquipmentMedicefModal #id").val(row.id);
 
           $("#editEquipmentMedicefModal").modal("toggle");
         },
-        "click .remove": function (e, value, row, index) {
+        "click .btn-danger": function (e, value, row, index) {
           const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
               confirmButton: "btn btn-success",
@@ -339,8 +338,7 @@
             .then((result) => {
               if (result.value) {
                 $.ajax({
-                  url:
-                    "http://127.0.0.1:3000/api/medicef/equipments/" + row._id,
+                  url: "http://127.0.0.1:3000/api/equipments/" + row.id,
                   method: "delete",
                   success: function (response) {
                     $("#table").bootstrapTable("refresh");
@@ -389,7 +387,7 @@
           columns: [
             {
               title: "Item ID",
-              field: "_id",
+              field: "id",
               align: "center",
               valign: "middle",
               visible: false,
@@ -404,7 +402,7 @@
               align: "center",
             },
             {
-              field: "type",
+              field: "parc",
               title: "Type",
               sortable: true,
               align: "center",
@@ -438,7 +436,7 @@
           columns: [
             {
               title: "Item ID",
-              field: "_id",
+              field: "id",
               align: "center",
               valign: "middle",
               visible: false,
@@ -453,7 +451,7 @@
               align: "center",
             },
             {
-              field: "type",
+              field: "parc",
               title: "Type",
               sortable: true,
               align: "center",
