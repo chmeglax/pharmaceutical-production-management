@@ -129,7 +129,7 @@
                     data-id-field="id"
                     data-page-list="[10, 25, 50, 100, all]"
                     data-show-footer="true"
-                    data-url="http://127.0.0.1:3000/api/equipments/1"
+                    data-url="/api/equipments/1"
                     data-response-handler="responseHandler"
                     data-show-print="true"
                   ></table>
@@ -182,7 +182,7 @@
                     data-id-field="id"
                     data-page-list="[10, 25, 50, 100, all]"
                     data-show-footer="true"
-                    data-url="http://127.0.0.1:3000/api/equipments/2"
+                    data-url="/api/equipments/2"
                     data-response-handler="responseHandler"
                     data-show-print="true"
                   ></table>
@@ -284,7 +284,7 @@
             .then((result) => {
               if (result.value) {
                 $.ajax({
-                  url: "http://127.0.0.1:3000/api/equipments/" + row.id,
+                  url: "/api/equipments/" + row.id,
                   method: "delete",
                   success: function (response) {
                     $("#table").bootstrapTable("refresh");
@@ -338,7 +338,7 @@
             .then((result) => {
               if (result.value) {
                 $.ajax({
-                  url: "http://127.0.0.1:3000/api/equipments/" + row.id,
+                  url: "/api/equipments/" + row.id,
                   method: "delete",
                   success: function (response) {
                     $("#table").bootstrapTable("refresh");

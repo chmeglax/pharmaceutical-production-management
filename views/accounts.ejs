@@ -129,7 +129,7 @@
                     data-id-field="id"
                     data-page-list="[5, 10, 25, all]"
                     data-show-footer="true"
-                    data-url="http://127.0.0.1:3000/api/users"
+                    data-url="/api/users"
                     data-response-handler="responseHandler"
                   ></table>
                 </div>
@@ -285,7 +285,7 @@
             .then((result) => {
               if (result.value) {
                 $.ajax({
-                  url: "http://127.0.0.1:3000/api/users/" + row.id,
+                  url: "/api/users/" + row.id,
                   method: "delete",
                   success: function (response) {
                     $("#table").bootstrapTable("refresh");

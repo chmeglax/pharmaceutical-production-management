@@ -117,7 +117,7 @@
     var type = $("#editEquipmentModal #type").children("option:selected").val();
 
     $.ajax({
-      url: "http://127.0.0.1:3000/api/equipments/" + id,
+      url: "/api/equipments/" + id,
       method: "patch",
       data: {
         name: name,
@@ -137,7 +137,7 @@
     var name = $("#addEquipmentModal #name").val();
     var type = $("#addEquipmentModal #type").children("option:selected").val();
     $.ajax({
-      url: "http://127.0.0.1:3000/api/equipments/",
+      url: "/api/equipments/",
       method: "post",
       data: {
         name: name,
@@ -250,7 +250,7 @@
     var phone = $("#editUserModal #phone").val();
     var email = $("#editUserModal #email").val();
     $.ajax({
-      url: "http://127.0.0.1:3000/api/users/" + id,
+      url: "/api/users/" + id,
       method: "patch",
       data: {
         name: name,
@@ -369,7 +369,7 @@
     var name = $("#editProductModal #name").val();
     var id = $("#editProductModal #id").val();
     $.ajax({
-      url: "http://127.0.0.1:3000/api/products/" + id,
+      url: "/api/products/" + id,
       method: "patch",
       data: {
         name: name,
@@ -394,7 +394,7 @@
     var name = $("#addProductModal #name").val();
 
     $.ajax({
-      url: "http://127.0.0.1:3000/api/products/",
+      url: "/api/products/",
       method: "post",
       data: {
         name: name,

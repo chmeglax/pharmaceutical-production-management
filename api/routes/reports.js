@@ -1,23 +1,48 @@
 const express = require("express");
 const router = express.Router();
 const connection = require("./../../config/dbConfig");
+const moment = require("moment");
 
 // Getting with date
-router.get("/:site/:start/:end", async (req, res) => {
+router.get("/:site/:start/:shiftType", async (req, res) => {
   try {
-    sql =
-      "SELECT  date,sum(plannedQty) plan,\
+    end = req.params.start.split("-");
+    end[1] = Number(end[1]) + 1;
+    end = end.join("-");
+    if (req.params.shiftType == "FullDay")
+      sql =
+        "SELECT  date,sum(plannedQty) plan,\
       sum(producedQty) prod\
       FROM hikma.dataentry \
         where date between '" +
-      req.params.start +
-      "' and '" +
-      req.params.end +
-      "' and site_id='" +
-      req.params.site +
-      "' group by date";
+        req.params.start +
+        "' and '" +
+        end +
+        "' and site_id='" +
+        req.params.site +
+        "' group by date";
+    else
+      sql =
+        "SELECT  date,sum(plannedQty) plan,\
+      sum(producedQty) prod\
+      FROM hikma.dataentry \
+        where date between '" +
+        req.params.start +
+        "' and '" +
+        end +
+        "' and site_id='" +
+        req.params.site +
+        "' and shiftType='" +
+        req.params.shiftType +
+        "' group by date";
 
     connection.query(sql, function (error, rows) {
+      rows.forEach((element) => {
+        if (element.date !== null) {
+          var x = moment(element.date).format("YYYY-MM-DD");
+          element.date = x;
+        }
+      });
       res.json(rows);
     });
   } catch (err) {
@@ -26,10 +51,12 @@ router.get("/:site/:start/:end", async (req, res) => {
 });
 
 // Getting with date
-router.get("/:site/:start/:end/:equipmentSelect", async (req, res) => {
+router.get("/:site/:start/:equipmentSelect/:shiftType", async (req, res) => {
   try {
     sql =
-      "SELECT       date,sum(break)+sum(PrevMaint)+sum(other) PlanDowntime,\
+      "SELECT sum(PrevMaint) PrevMaint , sum(Adjustments) Adjustments ,sum(WaitMaterials) WaitMaterials, sum(Waitperators) Waitperators ,sum(WaitQuality) WaitQuality,\
+       sum(WaitQVM) WaitQVM, sum(LackElectr) LackElectr, sum(LackAir) LackAir,sum(LackWater) LackWater,\
+      date,sum(break)+sum(PrevMaint)+sum(other) PlanDowntime,\
         sum(shiftDuration-1) totalWorkingTime,\
         sum(break) breakTime,    sum(Cleaning) cleaningTimeAndEndOfRun,    sum(Startup) startupTime,    sum(numberOfBreakdows) breakdownNumber, \
      sum(totalLackTIme)+sum(totalWaitingTime) breakdownsTime,    sum(totalWaitingTime) totalWaitingTime,\
@@ -42,29 +69,73 @@ router.get("/:site/:start/:end/:equipmentSelect", async (req, res) => {
   (sum(producedQty)/((sum(shiftDuration)-sum(totalLackTIme)-sum(totalWaitingTime))*avg(speed)))*100 performance ,\
      ((sum(scarp)+sum(rework))/sum(producedQty))*100 quality\
         FROM hikma.dataentry \
-          where date between '" +
+          where date = '" +
       req.params.start +
-      "' and '" +
-      req.params.end +
       "' and site_id='" +
       req.params.site +
       "' and equipment_id='" +
       req.params.equipmentSelect +
-      "' \
-          group by date";
-
+      "'";
+    if (req.params.shiftType != "FullDay")
+      sql = sql + " and shiftType='" + req.params.shiftType + "'";
     connection.query(sql, function (error, rows) {
+      test = 0;
       rows.forEach((element) => {
         element.oee =
           element.quality * element.performance * element.availibilty;
+        if (element.date !== null) {
+          var x = moment(element.date).format("YYYY-MM-DD");
+          element.date = x;
+        }
       });
-
       res.json(rows);
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
+// Getting OEE weekly data
+router.get(
+  "/:site/weekly/:start/:equipmentSelect/:shiftType",
+  async (req, res) => {
+    end = req.params.start.split("-");
+    end[1] = Number(end[1]) + 1;
+    end = end.join("-");
+    try {
+      sql =
+        "SELECT date, sum(plannedQty) plan,     sum(producedQty) prod,    (sum(producedQty)/sum(plannedQty))*100 productionOutput,\
+               ((sum(shiftDuration)-sum(totalLackTIme)-sum(totalWaitingTime))/sum(break))*100 availibilty,\
+                  (sum(producedQty)/((sum(shiftDuration)-sum(totalLackTIme)-sum(totalWaitingTime))*avg(speed)))*100 performance ,\
+        ((sum(scarp)+sum(rework))/sum(producedQty))*100 quality        FROM hikma.dataentry\
+        where date between '" +
+        req.params.start +
+        "' and '" +
+        end +
+        "' and site_id='" +
+        req.params.site +
+        "' and equipment_id='" +
+        req.params.equipmentSelect;
+
+      if (req.params.shiftType != "FullDay")
+        sql =
+          sql + "' and shiftType='" + req.params.shiftType + "' group by date";
+      else sql = sql + "' group by date";
+      connection.query(sql, function (error, rows) {
+        rows.forEach((element) => {
+          element.oee =
+            element.quality * element.performance * element.availibilty;
+          if (element.date !== null) {
+            var x = moment(element.date).format("YYYY-MM-DD");
+            element.date = x;
+          }
+        });
+        res.json(rows);
+      });
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  }
+);
 // Getting all
 router.get("/:site", async (req, res) => {
   try {
@@ -85,6 +156,10 @@ router.get("/:site", async (req, res) => {
       req.params.site +
       "'";
     connection.query(sql, function (error, rows) {
+      rows.forEach((element) => {
+        var x = moment(element.date).format("YYYY-MM-DD");
+        element.date = x;
+      });
       res.json(rows);
     });
   } catch (err) {

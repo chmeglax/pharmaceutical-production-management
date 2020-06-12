@@ -125,7 +125,7 @@
                     data-id-field="id"
                     data-page-list="[5, 10, 25, all]"
                     data-show-footer="true"
-                    data-url="http://127.0.0.1:3000/api/products/1"
+                    data-url="/api/products/1"
                     data-response-handler="responseHandler"
                   ></table>
                 </div>
@@ -181,7 +181,7 @@
                     data-id-field="id"
                     data-page-list="[5, 10, 25, all]"
                     data-show-footer="true"
-                    data-url="http://127.0.0.1:3000/api/products/2"
+                    data-url="/api/products/2"
                     data-response-handler="responseHandler"
                   ></table>
                 </div>
@@ -295,7 +295,7 @@
             .then((result) => {
               if (result.value) {
                 $.ajax({
-                  url: "http://127.0.0.1:3000/api/products/" + row.id,
+                  url: "/api/products/" + row.id,
                   method: "delete",
                   success: function (response) {
                     $("#table").bootstrapTable("refresh");
@@ -348,7 +348,7 @@
             .then((result) => {
               if (result.value) {
                 $.ajax({
-                  url: "http://127.0.0.1:3000/api/products/" + row.id,
+                  url: "/api/products/" + row.id,
                   method: "delete",
                   success: function (response) {
                     $("#medicef").bootstrapTable("refresh");

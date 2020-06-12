@@ -93,6 +93,21 @@
         <section class="content">
           <div class="row">
             <div class="col-12">
+              <% if(messages.info){%>
+              <div class="alert alert-success alert-dismissible">
+                <button
+                  type="button"
+                  class="close"
+                  data-dismiss="alert"
+                  aria-hidden="true"
+                >
+                  ×
+                </button>
+                <h6><i class="icon fas fa-check"></i> Alert!</h6>
+                <%= messages.info %>
+              </div>
+
+              <%}%>
               <!-- /.card -->
               <% if (user.site_id==1 || user.site_id==3) { %>
 
@@ -145,6 +160,20 @@
                         >
                         </select>
                       </div>
+                      <div class="form-group">
+                        <label for="shiftType">Shift type </label>
+
+                        <select
+                          name="shiftType"
+                          id="shiftType"
+                          class="form-control"
+                        >
+                          <option value="A">A</option>
+                          <option value="B">B</option>
+                          <option value="C">C</option>
+                          <option value="FullDay">Full day</option>
+                        </select>
+                      </div>
                     </div>
                     <!-- /.card-body -->
                     <center>
@@ -193,7 +222,7 @@
                     data-id-field="id"
                     data-page-list="[5, 10, 25, all]"
                     data-show-footer="true"
-                    data-url="http://127.0.0.1:3000/api/ManuelDataEntry/1"
+                    data-url="/api/reports/1/"
                     data-response-handler="responseHandler"
                   ></table>
                 </div>
