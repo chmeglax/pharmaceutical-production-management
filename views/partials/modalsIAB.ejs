@@ -262,6 +262,9 @@
           type: type,
         },
       },
+      xhrFields: {
+        withCredentials: true,
+      },
       success: function (response) {
         $("#table").bootstrapTable("refresh");
         $("#editUserModal").modal("toggle");

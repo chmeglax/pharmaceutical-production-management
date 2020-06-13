@@ -1,8 +1,9 @@
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcrypt");
-
+const RememberMeStrategy = require("passport-remember-me").Strategy;
 var connection = require("./dbConfig");
+utils = require("./utils");
 
 const customFields = {
   usernameField: "email",
@@ -141,6 +142,23 @@ passport.use(
   })
 );
 
+function consumeRememberMeToken(token, fn) {
+  //console.log("rememberMe Token: " + token);
+  var sql = "DELETE FROM `activityLog` WHERE (`token` = ?)";
+  var sqlSelect = "SELECT uid FROM `activityLog` WHERE token=?";
+  connection.query(sqlSelect, token, function (error, row) {
+    connection.query(sql, token, function (error, rows) {
+      return fn(null, row[0].uid);
+    });
+  });
+}
+
+function saveRememberMeToken(token, uid, fn) {
+  var sql = "INSERT INTO `hikma`.`activitylog` (`token`, `uid`) VALUES (?, ?);";
+  connection.query(sql, [token, uid], function (error, rows) {
+    return fn();
+  });
+}
 passport.serializeUser((user, done) => done(null, user.id));
 /*passport.deserializeUser((id, done) => {
     return done(null, getUserById(id))
@@ -154,3 +172,44 @@ passport.deserializeUser(function (id, done) {
 //}
 
 //module.exports = initialize
+
+// Remember Me cookie strategy
+//   This strategy consumes a remember me token, supplying the user the
+//   token was originally issued to.  The token is single-use, so a new
+//   token is then issued to replace it.
+passport.use(
+  new RememberMeStrategy(function (token, done) {
+    consumeRememberMeToken(token, function (err, uid) {
+      if (err) {
+        return done(err);
+      }
+      if (!uid) {
+        return done(null, false);
+      }
+      connection.query("SELECT * FROM user WHERE id='" + uid + "'", function (
+        err,
+        user
+      ) {
+        if (err) {
+          return done(err);
+        }
+        if (!user.length) {
+          return done(null, false);
+        }
+        return done(null, user[0]);
+      });
+    });
+  }, issueToken)
+);
+
+function issueToken(user, done) {
+  var token = utils.randomString(64);
+  saveRememberMeToken(token, user.id, function (err) {
+    if (err) {
+      return done(err);
+    }
+    return done(null, token);
+  });
+}
+
+module.exports = issueToken;

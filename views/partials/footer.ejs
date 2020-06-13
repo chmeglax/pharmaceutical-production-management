@@ -1,7 +1,5 @@
 <!-- jQuery -->
 <script src="../assets/plugins/jquery/jquery.min.js"></script>
-<!-- jQuery -->
-<script src="../assets/js/ajax.js"></script>
 <!-- jQuery UI 1.11.4 -->
 <script src="../assets/plugins/jquery-ui/jquery-ui.min.js"></script>
 <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
@@ -35,8 +33,133 @@
 <script src="/assets/dist/js/pages/dashboard.js"></script>
 <!-- hikma for demo purposes -->
 <script src="/assets/dist/js/demo.js"></script>
-<script>
-   $( "#homeNav" ).addClass( "active" );
+<script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript">
+     $( "#homeNav" ).addClass( "active" );
+      $(function () {
+  // Sales graph chart
+  var salesGraphChartCanvas = $("#line-chart").get(0).getContext("2d");
+  //$('#revenue-chart').get(0).getContext('2d');
+
+  var salesGraphChartData = {
+    labels: [
+
+    ],
+    datasets: [
+      {
+        label: "Tempreture",
+        fill: false,
+        borderWidth: 2,
+        lineTension: 0,
+        spanGaps: true,
+        borderColor: "#241147",
+        pointRadius: 3,
+        pointHoverRadius: 7,
+        pointColor: "#241147",
+        pointBackgroundColor: "#241147",
+        data: [],
+      },
+      {
+        label: "Humidity",
+        fill: false,
+        borderWidth: 2,
+        lineTension: 0,
+        spanGaps: true,
+        borderColor: "#efefef",
+        pointRadius: 3,
+        pointHoverRadius: 7,
+        pointColor: "#efefef",
+        pointBackgroundColor: "#efefef",
+        data: [],
+      },
+    ],
+  };
+
+  var salesGraphChartOptions = {
+    maintainAspectRatio: false,
+    responsive: true,
+    legend: {
+      display: true,
+      
+    },
+    scales: {
+      xAxes: [
+        {scaleLabel: {
+          display: true,
+          labelString: "Time",
+          fontColor: "white",
+                fontSize: 15
+        },
+          ticks: {
+            fontColor: "#241147",
+          },
+          gridLines: {
+            display: false,
+            color: "#241147",
+            drawBorder: false,
+          },
+        },
+      ],
+      yAxes: [
+        {scaleLabel: {
+          display: true,
+          
+        },
+          ticks: {
+            stepSize: 5000,
+            fontColor: "#efefef",
+          },
+          gridLines: {
+            display: false,
+            color: "#efefef",
+            drawBorder: false,
+          },
+        },
+      ],
+    },
+  };
+
+  // This will get the first returned node in the jQuery collection.
+  var salesGraphChart = new Chart(salesGraphChartCanvas, {
+    type: "line",
+    data: salesGraphChartData,
+    options: salesGraphChartOptions,
+  });
+
+        //socket
+        var socket = io();
+        socket.on("product", function (msg) {
+          $('#productCountError').html("");
+         console.log(msg)
+         $('#productCount').html(msg);
+        });
+        socket.on("shutdown", function (msg) {
+         console.log(msg)
+         $('#productCount').html("");
+         $('#productCountError').html(msg);
+        });
+
+        socket.on("temp", function (msg) {
+         console.log(msg)
+         addData(salesGraphChart,msg)
+        });
+        function addData(chart, data) {
+          var today = new Date();
+var time = today.getHours() + ":" + today.getMinutes() ;
+if(chart.data.labels.length>10){
+  chart.data.datasets[0].data.shift()
+  chart.data.datasets[1].data.shift()
+  chart.data.labels.shift()
+}
+    chart.data.labels.push(time);
+    result=data.split('/')
+    chart.data.datasets[0].data.push(result[0])
+    chart.data.datasets[1].data.push(result[1])
+    chart.update();
+}
+
+
+      });
 </script>
 
 </body>

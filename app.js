@@ -11,22 +11,20 @@ const passport = require("passport");
 const cookieParser = require("cookie-parser");
 var bodyParser = require("body-parser");
 var getJSON = require("get-json");
-//!models
-const IABshifts = require("./api/models/IABshifts.js");
-const MEDICEFshifts = require("./api/models/MEDICEFshifts");
 
 const session = require("express-session");
 const flash = require("express-flash");
-
+const jwt = require("jsonwebtoken");
 app.set("view engine", "ejs");
 app.use("/assets", express.static("assets"));
 app.use("/node_modules", express.static("node_modules"));
 
 // Enable express to parse body data from raw application/json data
 app.use(express.json());
-
+app.use(bodyParser.json());
 // Enables express to parse body data from x-www-form-encoded data
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use(flash());
 
 app.use(
@@ -36,27 +34,25 @@ app.use(
     saveUninitialized: false,
   })
 );
-//!API
-const apiEquipments = require("./api/routes/equipments");
-app.use("/api/equipments", apiEquipments);
-const apiRouterUsers = require("./api/routes/users");
-app.use("/api/users", apiRouterUsers);
-const apiProducts = require("./api/routes/products");
-app.use("/api/products", apiProducts);
-const apiManuelDataENtry = require("./api/routes/manualDataEntry");
-app.use("/api/ManuelDataEntry", apiManuelDataENtry);
-const apiReports = require("./api/routes/reports");
-app.use("/api/reports", apiReports);
 
-const apiIABshifts = require("./api/routes/IABshifts");
-app.use("/api/iab/shifts", apiIABshifts);
-const apiMEDICEFshifts = require("./api/routes/MEDICEFshifts");
-app.use("/api/medicef/shifts", apiMEDICEFshifts);
-
-const initializePassport = require("./config/passport-config");
+//passport
+const passportConfig = require("./config/passport-config");
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(passport.authenticate("remember-me"));
+//!API
+const apiEquipments = require("./api/routes/equipments");
+app.use("/api/equipments", checkAuthenticated, apiEquipments);
+const apiRouterUsers = require("./api/routes/users");
+app.use("/api/users", isAdmin, apiRouterUsers);
+const apiProducts = require("./api/routes/products");
+app.use("/api/products", checkAuthenticated, apiProducts);
+const apiManuelDataENtry = require("./api/routes/manualDataEntry");
+app.use("/api/ManuelDataEntry", checkAuthenticated, apiManuelDataENtry);
+const apiReports = require("./api/routes/reports");
+app.use("/api/reports", checkAuthenticated, apiReports);
+
 /*app.use((req, res, next) => {
   console.log(req.session);
   console.log(req.user);
@@ -93,7 +89,7 @@ app.get("/", checkAuthenticated, function (req, res) {
 app.get("/test", checkAuthenticated, function (req, res) {
   res.render("test");
 });
-app.get("/accounts", isAdmin, function (req, res) {
+app.get("/accounts", function (req, res) {
   res.render("accounts", { user: req.user });
 });
 app.get("/equipments", checkAuthenticated, function (req, res) {
@@ -134,22 +130,35 @@ app.post(
     failureFlash: true,
   })
 );
+
 app.post(
   "/login",
-  checkNotAuthenticated,
   passport.authenticate("local", {
-    successRedirect: "/",
     failureRedirect: "/login",
     failureFlash: true,
   }),
-  (req, res) => {
-    if (req.body.remember) {
-      req.session.cookie.originalMaxAge = 24 * 60 * 60 * 1000; // Expires in 1 day
-      console.log("remember checked");
-    } else {
-      req.session.cookie.expires = false;
-      console.log("remember not checked");
+  async function (req, res, next) {
+    await generateToken(res, req.user.id, req.user.email);
+
+    // Issue a remember me cookie if the option was checked
+    if (!req.body.remember) {
+      return next();
     }
+
+    passportConfig(req.user, function (err, token) {
+      if (err) {
+        return next(err);
+      }
+      res.cookie("remember_me", token, {
+        path: "/",
+        httpOnly: true,
+        maxAge: 604800000,
+      });
+      return next();
+    });
+  },
+  function (req, res) {
+    res.redirect("/");
   }
 );
 
@@ -176,9 +185,60 @@ function checkNotAuthenticated(req, res, next) {
   next();
 }
 app.get("/logout", (req, res) => {
+  res.clearCookie("remember_me");
   req.logOut();
+
   res.redirect("/login");
 });
-app.listen(port, hostname, () => {
+var server = app.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
+});
+
+async function verifyToken(req, res, next) {
+  const token = req.cookies.token || "";
+  try {
+    if (!token) {
+      return res.status(401).json("You need to Login");
+    }
+    const decrypt = await jwt.verify(token, process.env.JWT_SECRET);
+    req.user = {
+      id: decrypt.id,
+      firstname: decrypt.firstname,
+    };
+    next();
+  } catch (err) {
+    return res.status(500).json(err.toString());
+  }
+}
+function generateToken(res, id, firstname) {
+  const expiration = process.env.DB_ENV === "testing" ? 100 : 604800000;
+  const token = jwt.sign({ id, firstname }, process.env.JWT_SECRET, {
+    expiresIn: process.env.DB_ENV === "testing" ? "1d" : "7d",
+  });
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: false,
+    maxAge: 3600000,
+  });
+}
+
+//!socketIo
+var io = require("socket.io").listen(server);
+
+io.on("connection", function (socket) {
+  console.log("Client Connected");
+
+  socket.on("product", function (state) {
+    console.log("product now : " + state);
+    io.emit("product", state);
+  });
+  socket.on("shutdown", function (msg) {
+    console.log("shutdown: " + msg);
+    io.emit("shutdown", msg);
+  });
+  socket.on("temp", function (msg) {
+    console.log("temp: " + msg);
+    io.emit("temp", msg);
+  });
 });
