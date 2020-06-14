@@ -58,20 +58,7 @@
         pointColor: "#241147",
         pointBackgroundColor: "#241147",
         data: [],
-      },
-      {
-        label: "Humidity",
-        fill: false,
-        borderWidth: 2,
-        lineTension: 0,
-        spanGaps: true,
-        borderColor: "#efefef",
-        pointRadius: 3,
-        pointHoverRadius: 7,
-        pointColor: "#efefef",
-        pointBackgroundColor: "#efefef",
-        data: [],
-      },
+      }
     ],
   };
 
@@ -79,7 +66,7 @@
     maintainAspectRatio: false,
     responsive: true,
     legend: {
-      display: true,
+      display: false,
       
     },
     scales: {
@@ -101,19 +88,22 @@
         },
       ],
       yAxes: [
-        {scaleLabel: {
-          display: true,
-          
-        },
-          ticks: {
-            stepSize: 5000,
-            fontColor: "#efefef",
+        {
+            scaleLabel: {
+            display: true,
+            labelString: "Celcus",
+            fontColor: "white",
+            fontSize: 15
           },
-          gridLines: {
-            display: false,
-            color: "#efefef",
-            drawBorder: false,
-          },
+            ticks: {
+              stepSize: 5000,
+              fontColor: "#efefef",
+            },
+            gridLines: {
+              display: true,
+              color: "#efefef",
+              drawBorder: false,
+            },
         },
       ],
     },
@@ -125,6 +115,19 @@
     data: salesGraphChartData,
     options: salesGraphChartOptions,
   });
+  // Sales graph chart
+  var humidityChartCanvas = $("#humidity-chart").get(0).getContext("2d");
+  var humidityChartData = jQuery.extend(true, {}, salesGraphChartData);
+  humidityChartData.datasets[0].label="Humidity"
+  var humidityChartOptions=jQuery.extend(true, {}, salesGraphChartOptions);
+  humidityChartOptions.scales.yAxes[0].scaleLabel.labelString = "%"
+    // This will get the first returned node in the jQuery collection.
+    var humidityChart = new Chart(humidityChartCanvas, {
+    type: "line",
+    data: humidityChartData,
+    options: humidityChartOptions,
+  });
+
 
         //socket
         var socket = io();
@@ -140,23 +143,25 @@
         });
 
         socket.on("temp", function (msg) {
+          result=msg.split('/')
          console.log(msg)
-         addData(salesGraphChart,msg)
+         addData(salesGraphChart,result[0])
+         addData(humidityChart,result[1])
         });
         function addData(chart, data) {
+
           var today = new Date();
-var time = today.getHours() + ":" + today.getMinutes() ;
-if(chart.data.labels.length>10){
-  chart.data.datasets[0].data.shift()
-  chart.data.datasets[1].data.shift()
-  chart.data.labels.shift()
-}
-    chart.data.labels.push(time);
-    result=data.split('/')
-    chart.data.datasets[0].data.push(result[0])
-    chart.data.datasets[1].data.push(result[1])
-    chart.update();
-}
+          var time = today.getHours() + ":" + today.getMinutes() ;
+          
+          if(chart.data.labels.length>10) {
+            chart.data.datasets[0].data.shift()
+            chart.data.labels.shift()
+          }
+
+              chart.data.labels.push(time);
+              chart.data.datasets[0].data.push(data)
+              chart.update();
+        }
 
 
       });

@@ -89,6 +89,12 @@ app.get("/", checkAuthenticated, function (req, res) {
 app.get("/test", checkAuthenticated, function (req, res) {
   res.render("test");
 });
+app.get("/realTimeSupervision", checkAuthenticated, function (req, res) {
+  res.render("realTimeSupervision", {
+    user: req.user,
+    raspberryIP: process.env.RASPBERRY_IP,
+  });
+});
 app.get("/accounts", function (req, res) {
   res.render("accounts", { user: req.user });
 });
